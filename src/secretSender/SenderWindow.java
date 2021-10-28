@@ -11,6 +11,7 @@ import java.net.SocketException;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
@@ -62,7 +63,9 @@ public class SenderWindow extends JFrame implements ActionListener {
 
 	private IpPortWindow piccolaFinestraDiInput;
 
-	SenderSocket s;
+	private Cifratore macchinaCifratrice  = new Cifratore();;
+
+	private SenderSocket s;
 
 	public SenderWindow() {
 		super("SecretSender");
@@ -178,61 +181,108 @@ public class SenderWindow extends JFrame implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent listener) {
-		testoDaCifraCampo.setEditable(false);
-		codiceNumericoCampo.setEditable(false);
-		chiaveCampo.setEditable(false);
-		metodoDiCifratura.setEnabled(false);
-		pulsanteDiConnessione.setEnabled(false);
-		invioMessaggio.setEnabled(false);
 
+		/*
+		 * Pulsante necessario per impostare i dati per inviare il messaggio al
+		 * destinatario
+		 */
 		if(pulsanteDiConnessione == listener.getSource()) {
 			piccolaFinestraDiInput = new IpPortWindow();
 			piccolaFinestraDiInput.setVisible(true);
 		}
 
-		if(invioMessaggio == listener.getSource() && metodoDiCifratura.getSelectedIndex() == 0) {
-			if(!testoDaCifraCampo.getText().isBlank() || //Se il testo non è vuoto
-					!codiceNumericoCampo.getText().isBlank() || //Se il numero dell'agente non è vuoto
-					Integer.parseInt(chiaveCampo.getText()) > 0 //Se la chiave è maggiore di 0
-					) {
-				Cifratore macchinaCifratrice = new Cifratore();
+		/*
+		 * Quando il pulsante d'invio viene cliccato ci sono prima delle condizioni necessarie per
+		 * inviare il messaggio al destinatario
 
-				/*
-				 * Cifratura del messaggio
-				 */
-				macchinaCifratrice.cifraturaDiCesare(testoDaCifraCampo.getText(), codiceNumericoCampo.getText(), Integer.parseInt(chiaveCampo.getText()));
-
-				System.out.println("Cifratura del messaggio completata, metodo di Cesare");
-			}
-			else {
-
-			}
+		 * Condizioni:
+		 * 1: Il messaggio deve essere minimo 1 carattere e massimo 512 caratteri
+		 * 2: Il codice dell'agente deve essere solo ed esclusivamente di 4 cifre numeriche
+		 * 3: La chiave deve essere coerente con il metodo di cifratura
+		 * 	  		Se il metodo di cifratura è quella di Cesare
+		 * 			la chiave deve essere un numero maggiore di 1
+		 * 
+		 * 			Se il metodo di cifratura è quello di Vigenère
+		 * 			la chiave deve essere una stringa di caratteri
+		 * 4: L'indirizzo ip e la porta del destinatario siano stati inseriti
+		 * 	  		Verificare la correttezza dell'indirizzo IP
+		 * 			Verifica che la porta sia un valore compreso tra 1024 e 65535
+		 */
+		if(invioMessaggio == listener.getSource() && metodoDiCifratura.getSelectedIndex() == 0) {			
+			testoDaCifraCampo.setEditable(false);
+			codiceNumericoCampo.setEditable(false);
+			chiaveCampo.setEditable(false);
+			metodoDiCifratura.setEnabled(false);
+			pulsanteDiConnessione.setEnabled(false);
+			invioMessaggio.setEnabled(false);
 
 			/*
-			 * Condizioni di non invio del messaggio
-			 * Ip uguale a null (cioè ancora non inserito)
-			 * Porta uguale a 0 (la porta non può essere 0)
-
-			if(s.getIp() == null || s.getPorta() == 0) {
-
-			}
-			else {
-				try {
-					s = new SenderSocket();
-				} catch (SocketException e) {
-					e.printStackTrace();
+			 * Controllo che il codice dell'agente contenga solo cifre
+			 */
+			boolean correttezzaDellInseritoCodice = true;
+			for(int i = 0; i < 10;i++) {
+				if(
+						!(codiceNumericoCampo.getText().contains(Integer.toString((int) Integer.toString(i).charAt(i))))
+						)
+				{
+					correttezzaDellInseritoCodice = false;
 				}
+			}
 
-				System.out.println("Invio del messaggio al destinatario specificato");
+			//Se il testo non è vuoto)
+			if(!testoDaCifraCampo.getText().isBlank()){//Se il testo non è vuoto
+				if(Integer.parseInt(testoDaCifraCampo.getText()) <= 512){//Se il testo è minore o ugale a 512 caratteri
+					if(codiceNumericoCampo.getText().length() == 4){//Se il numero di cifre del codice agente è uguale a 4
+						if(Integer.parseInt(chiaveCampo.getText()) > 1){//Se la chiave è maggiore di 1
+							if(correttezzaDellInseritoCodice){//Se la stringa contiene solo cifre								
+								/*
+								 * Cifratura del messaggio
+								 */
+								macchinaCifratrice.cifraturaDiCesare(testoDaCifraCampo.getText(), codiceNumericoCampo.getText(), Integer.parseInt(chiaveCampo.getText()));
 
-			}*/
+								System.out.println("Cifratura del messaggio completata, metodo di Cesare");
+
+								if(s.getIp() == null || s.getPorta() == 0) {
+									try {
+										s = new SenderSocket();
+									} catch (SocketException e) {
+										e.printStackTrace();
+									}
+
+									/*
+									 * GOOD ENDING
+									 * Tutte le condizioni sono andate a buon fine, adesso si procede per l'invio
+									 * del messaggio
+									 */
+									System.out.println("Invio del messaggio al destinatario specificato");
+									s.invioMessaggio("");
+								}else {									
+									JOptionPane.showMessageDialog(null, "Devi inserire un indirizzo ip e una porta", "Errore", JOptionPane.ERROR_MESSAGE);
+								}
+							}else {
+								JOptionPane.showMessageDialog(null, "La stringa deve contenere solo cifre", "Errore", JOptionPane.ERROR_MESSAGE);
+							}
+						}else {
+							JOptionPane.showMessageDialog(null, "La chiave deve essere maggiore di 1", "Errore", JOptionPane.ERROR_MESSAGE);
+						}
+					}else {
+						JOptionPane.showMessageDialog(null, "Il codice dell'agente può essere solo di 4 cifre", "Errore", JOptionPane.ERROR_MESSAGE);
+					}
+				}else {
+					JOptionPane.showMessageDialog(null, "Il messaggio è troppo lungo", "Errore", JOptionPane.ERROR_MESSAGE);
+				}
+			}else {
+				JOptionPane.showMessageDialog(null, "Non hai inserito alcun messaggio", "Errore", JOptionPane.ERROR_MESSAGE);
+			}
+
 			testoDaCifraCampo.setEditable(true);
 			codiceNumericoCampo.setEditable(true);
 			chiaveCampo.setEditable(true);
 			metodoDiCifratura.setEnabled(true);
 			pulsanteDiConnessione.setEnabled(true);
 			invioMessaggio.setEnabled(true);
-		}
+		}//Chiusura ActionListener del tasto invio (metodo di Cesare)
+
 		if(invioMessaggio == listener.getSource() && metodoDiCifratura.getSelectedIndex() == 1) {
 			testoDaCifraCampo.setEditable(false);
 			codiceNumericoCampo.setEditable(false);
@@ -243,6 +293,6 @@ public class SenderWindow extends JFrame implements ActionListener {
 
 			System.out.println("Cifratura del messaggio completata, metodo di Vigenère");
 
-		}
-	}
+		}//Chiusura ActionListener del tasto invio (metodo di Vigenère)
+	}//Chiusura metodo degli ActionListener
 }

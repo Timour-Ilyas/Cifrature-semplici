@@ -58,10 +58,9 @@ public class SenderSocket {
 	 * Metodo che invia il messaggio al destinatario specificato dai dati inseriti
 	 * Se non sono stati impostati i dati, non viene utilizzato il metodo
 	 */
-	public void invioMessaggio() {
+	public void invioMessaggio(String msg) {
 		try 
 		{
-			msg = "Sopra";
 			dp = new DatagramPacket(msg.getBytes(),msg.getBytes().length,ip,porta);
 
 			System.out.println("Richiesta inviata: andare in su");
