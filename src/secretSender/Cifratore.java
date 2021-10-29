@@ -136,6 +136,7 @@ public class Cifratore {
 		}
 
 
+		
 		return messaggioCifrato;
 	}
 }

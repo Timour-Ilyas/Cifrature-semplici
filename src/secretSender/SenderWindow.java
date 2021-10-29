@@ -56,7 +56,6 @@ public class SenderWindow extends JFrame implements ActionListener {
 
 	private JComboBox<String> metodoDiCifratura;
 
-
 	private JButton pulsanteDiConnessione;
 
 	private JButton invioMessaggio;
@@ -105,6 +104,7 @@ public class SenderWindow extends JFrame implements ActionListener {
 		superioreTitolo.add(titolo);
 
 		testoDaCifraCampo.setPreferredSize(new Dimension(400, 200));
+		testoDaCifraCampo.setDocument(new JTextLimit(5));
 
 		pannelloFrattoTre.add(testoDaCifraCampo, BorderLayout.CENTER);
 		pannelloFrattoTre.add(contatoreCaratteri, BorderLayout.CENTER);
@@ -242,6 +242,10 @@ public class SenderWindow extends JFrame implements ActionListener {
 
 								System.out.println("Cifratura del messaggio completata, metodo di Cesare");
 
+								s.setMsg(testoDaCifraCampo.getText());
+								s.setIp(piccolaFinestraDiInput.restituisci(s.getIp()));
+								s.setPorta(piccolaFinestraDiInput.restituisci(s.getPorta()));
+
 								if(s.getIp() == null || s.getPorta() == 0) {
 									try {
 										s = new SenderSocket();
@@ -256,6 +260,7 @@ public class SenderWindow extends JFrame implements ActionListener {
 									 */
 									System.out.println("Invio del messaggio al destinatario specificato");
 									s.invioMessaggio("");
+
 								}else {									
 									JOptionPane.showMessageDialog(null, "Devi inserire un indirizzo ip e una porta", "Errore", JOptionPane.ERROR_MESSAGE);
 								}
@@ -290,6 +295,8 @@ public class SenderWindow extends JFrame implements ActionListener {
 			metodoDiCifratura.setEnabled(false);
 			pulsanteDiConnessione.setEnabled(false);
 			invioMessaggio.setEnabled(false);
+
+
 
 			System.out.println("Cifratura del messaggio completata, metodo di Vigenère");
 
