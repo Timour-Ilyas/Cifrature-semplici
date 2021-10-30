@@ -17,13 +17,13 @@ public class SenderSocket {
 	private DatagramPacket pacchettoDaRicezioneTerziario;
 	private String risposta;
 	private InetAddress ip;
-	private int porta;
+	private int porta = 0;
 	private String msg;
 	private DatagramPacket dp;
+	private int portaPropria = 50001;
 
 	public SenderSocket() throws SocketException {
-		socket = new DatagramSocket(porta);
-
+		socket = new DatagramSocket(portaPropria);
 	}
 
 	/*
@@ -58,12 +58,11 @@ public class SenderSocket {
 	 * Metodo che invia il messaggio al destinatario specificato dai dati inseriti
 	 * Se non sono stati impostati i dati, non viene utilizzato il metodo
 	 */
-	public void invioMessaggio(String msg) {
+	public void invioMessaggio() {
 		try 
 		{
 			dp = new DatagramPacket(msg.getBytes(),msg.getBytes().length,ip,porta);
 
-			System.out.println("Richiesta inviata: andare in su");
 			socket.send(dp);
 		} catch (IOException e) {
 			Logger.getLogger(SenderSocket.class.getName()).log(Level.SEVERE, null, e);			

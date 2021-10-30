@@ -1,5 +1,5 @@
 /*
- * Classe con la funzione di poter limitare i caratteri in un campo di testo
+ * Classe con la funzione di poter limitare i caratteri in un JTextField
  */
 package secretSender;
 import javax.swing.text.PlainDocument;
@@ -21,5 +21,6 @@ public class JTextLimit extends PlainDocument {
 		if ((getLength() + str.length()) <= limit) {
 			super.insertString(offset, str, attr);
 		}
-	}	
+	}
+	
 }

@@ -11,15 +11,17 @@
 
  ** in output: Messaggio cifrato
 
- ** Osservazioni: Il programma contiene 5 classi
+ ** Osservazioni: Il programma contiene 7 classi
 				  Il programma utilizza socket UDP, quindi non è certo che il messaggio
 				  arrivi al destinatario, è stato pensato un metodo per accertarsi che
 				  il messaggio sia arrivato al destinatario
  */
 package secretSender;
 
+import java.net.SocketException;
+
 public class SecretSender {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SocketException {
 		SenderWindow obj = new SenderWindow();
 		obj.setVisible(true);
 		System.out.println("SecretSender Attivato");

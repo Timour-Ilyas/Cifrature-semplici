@@ -4,30 +4,22 @@
 package secretSender;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
 import java.net.SocketException;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.KeyStroke;
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import java.awt.Font;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 
-public class SenderWindow extends JFrame implements ActionListener {
+public class SenderWindow extends JFrame implements ActionListener{
 	private static final long serialVersionUID = 1917L;
 
 	/*
@@ -42,7 +34,7 @@ public class SenderWindow extends JFrame implements ActionListener {
 
 	private JLabel titolo;
 
-	private JTextPane testoDaCifraCampo;
+	private JTextPaneLimit testoDaCifraCampo;
 
 	private JLabel contatoreCaratteri;
 
@@ -62,13 +54,15 @@ public class SenderWindow extends JFrame implements ActionListener {
 
 	private IpPortWindow piccolaFinestraDiInput;
 
-	private Cifratore macchinaCifratrice  = new Cifratore();;
+	private Cifratore macchinaCifratrice  = new Cifratore();
 
 	private SenderSocket s;
 
-	public SenderWindow() {
+	public SenderWindow() throws SocketException {
 		super("SecretSender");
 		initComponents();
+
+		s = new SenderSocket();
 	}
 
 	private void initComponents() {
@@ -81,9 +75,9 @@ public class SenderWindow extends JFrame implements ActionListener {
 		inferioreInput = new JPanel();
 		pannelloSubInferiore = new JPanel();
 		titolo = new JLabel();
-		testoDaCifraCampo = new JTextPane();
+		testoDaCifraCampo = new JTextPaneLimit();
 		scrittaPerCodiceNumerico = new JLabel();
-		codiceNumericoCampo = new JTextField(30);
+		codiceNumericoCampo = new JTextField(3);
 		scrittaPerChiave = new JLabel();
 		chiaveCampo = new JTextField();
 		metodoDiCifratura = new JComboBox<String>();
@@ -97,24 +91,29 @@ public class SenderWindow extends JFrame implements ActionListener {
 		titolo.setText("SecretSender");
 		titolo.setFont(new Font("Bold",70,70));
 		contatoreCaratteri.setText("512");
+		contatoreCaratteri.setForeground(Color.GREEN);
 
 		pulsanteDiConnessione.setText("Impostazioni connessione");
 		invioMessaggio.setText("Invio messaggio");
 
+		scrittaPerCodiceNumerico.setText("Codice agente ");
+		codiceNumericoCampo.setDocument(new JTextLimit(4));
+
+		scrittaPerChiave.setText("Chiave ");
+
+		metodoDiCifratura.setModel(new DefaultComboBoxModel<>(new String[] { "Cifrario di Cesare", "Cifrario di Vigenère"}));
+
+		/*
+		 * Inserimento componenti nel JFrame
+		 */
 		superioreTitolo.add(titolo);
 
 		testoDaCifraCampo.setPreferredSize(new Dimension(400, 200));
-		testoDaCifraCampo.setDocument(new JTextLimit(5));
 
 		pannelloFrattoTre.add(testoDaCifraCampo, BorderLayout.CENTER);
 		pannelloFrattoTre.add(contatoreCaratteri, BorderLayout.CENTER);
 
 		pannelloPerTestoDaCifrare.add(pannelloFrattoTre);
-
-		scrittaPerCodiceNumerico.setText("Codice agente ");
-		scrittaPerChiave.setText("Chiave ");
-
-		metodoDiCifratura.setModel(new DefaultComboBoxModel<>(new String[] { "Cifrario di Cesare", "Cifrario di Vigenère"}));
 
 		codiceNumericoCampo.setPreferredSize(new Dimension(20, 50));
 		chiaveCampo.setPreferredSize(new Dimension(200, 50));
@@ -138,53 +137,30 @@ public class SenderWindow extends JFrame implements ActionListener {
 		/*
 		 * Attivazione ActionListener
 		 */
-
-
-
-
-
-		int condition = JComponent.WHEN_FOCUSED;
-		InputMap iMap = testoDaCifraCampo.getInputMap(condition);
-		ActionMap aMap = testoDaCifraCampo.getActionMap();
-
-		String enter = "enter";
-		iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), enter);
-		aMap.put(enter, new AbstractAction() {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				System.out.println("enter pressed");
-			}
-		});
-
-		testoDaCifraCampo.addFocusListener(new FocusListener() {
-			public void focusGained(FocusEvent eListener) {
-
-			}
-			public void focusLost(FocusEvent eListener) {}
-		});
-
-
-
-
 		pulsanteDiConnessione.addActionListener(this);
 		invioMessaggio.addActionListener(this);
 	}
 
-	private void keyTyped(java.awt.event.KeyEvent evt) {
-		int key = evt.getKeyCode();
-		if (key == KeyEvent.VK_ENTER) {
-			contatoreCaratteri.setText(Integer.toString(512 - testoDaCifraCampo.getText().length()));					}
+	/*
+	 * Metodo utilizzato per il controllo del codice dell'agente per assicurarsi che contenga solo cifre
+	 */
+	private static boolean osservatoreSpeciale(String stringa) 
+	{ 
+		try 
+		{  
+			Double.parseDouble(stringa);  
+			return true;
+		} catch(NumberFormatException e)
+		{  
+			return false;  
+		}  
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent listener) {
 
 		/*
-		 * Pulsante necessario per impostare i dati per inviare il messaggio al
-		 * destinatario
+		 * Pulsante necessario per impostare i dati in modo da inviare il messaggio al destinatario
 		 */
 		if(pulsanteDiConnessione == listener.getSource()) {
 			piccolaFinestraDiInput = new IpPortWindow();
@@ -197,7 +173,11 @@ public class SenderWindow extends JFrame implements ActionListener {
 
 		 * Condizioni:
 		 * 1: Il messaggio deve essere minimo 1 carattere e massimo 512 caratteri
+		 * 		La condizione della dimensione di massimo 512 caratteri viene gestita dal
+		 * 		limite massimo di caratteri inseribili nel JTextPane (se ne occupa la classe: JTextPaneLimit)
 		 * 2: Il codice dell'agente deve essere solo ed esclusivamente di 4 cifre numeriche
+		 * 		(ciò viene permesso dal limite di caratteri che sono possibili inserire nel JTextField
+		 * 		 grazie alla classe: JTextLimit)
 		 * 3: La chiave deve essere coerente con il metodo di cifratura
 		 * 	  		Se il metodo di cifratura è quella di Cesare
 		 * 			la chiave deve essere un numero maggiore di 1
@@ -216,65 +196,40 @@ public class SenderWindow extends JFrame implements ActionListener {
 			pulsanteDiConnessione.setEnabled(false);
 			invioMessaggio.setEnabled(false);
 
-			/*
-			 * Controllo che il codice dell'agente contenga solo cifre
-			 */
-			boolean correttezzaDellInseritoCodice = true;
-			for(int i = 0; i < 10;i++) {
-				if(
-						!(codiceNumericoCampo.getText().contains(Integer.toString((int) Integer.toString(i).charAt(i))))
-						)
-				{
-					correttezzaDellInseritoCodice = false;
-				}
-			}
-
 			//Se il testo non è vuoto)
 			if(!testoDaCifraCampo.getText().isBlank()){//Se il testo non è vuoto
-				if(Integer.parseInt(testoDaCifraCampo.getText()) <= 512){//Se il testo è minore o ugale a 512 caratteri
-					if(codiceNumericoCampo.getText().length() == 4){//Se il numero di cifre del codice agente è uguale a 4
-						if(Integer.parseInt(chiaveCampo.getText()) > 1){//Se la chiave è maggiore di 1
-							if(correttezzaDellInseritoCodice){//Se la stringa contiene solo cifre								
-								/*
-								 * Cifratura del messaggio
-								 */
-								macchinaCifratrice.cifraturaDiCesare(testoDaCifraCampo.getText(), codiceNumericoCampo.getText(), Integer.parseInt(chiaveCampo.getText()));
+				if(Integer.parseInt(chiaveCampo.getText()) > 1){//Se la chiave è maggiore di 1
+					if(osservatoreSpeciale(codiceNumericoCampo.getText())){//Se la stringa contiene solo cifre								
+						/*
+						 * Cifratura del messaggio
+						 */
+						macchinaCifratrice.cifraturaDiCesare(testoDaCifraCampo.getText(), codiceNumericoCampo.getText(), Integer.parseInt(chiaveCampo.getText()));
 
-								System.out.println("Cifratura del messaggio completata, metodo di Cesare");
+						System.out.println("Cifratura del messaggio completata, metodo di Cesare");
 
-								s.setMsg(testoDaCifraCampo.getText());
-								s.setIp(piccolaFinestraDiInput.restituisci(s.getIp()));
-								s.setPorta(piccolaFinestraDiInput.restituisci(s.getPorta()));
+						s.setMsg(testoDaCifraCampo.getText());
 
-								if(s.getIp() == null || s.getPorta() == 0) {
-									try {
-										s = new SenderSocket();
-									} catch (SocketException e) {
-										e.printStackTrace();
-									}
+						try{
+							s.setIp(piccolaFinestraDiInput.restituisci(s.getIp()));
+							s.setPorta(piccolaFinestraDiInput.restituisci(s.getPorta()));
+						}catch(NullPointerException e) {
+							JOptionPane.showMessageDialog(null, "Devi inserire un indirizzo ip e una porta", "Errore", JOptionPane.ERROR_MESSAGE);	
+						}
 
-									/*
-									 * GOOD ENDING
-									 * Tutte le condizioni sono andate a buon fine, adesso si procede per l'invio
-									 * del messaggio
-									 */
-									System.out.println("Invio del messaggio al destinatario specificato");
-									s.invioMessaggio("");
-
-								}else {									
-									JOptionPane.showMessageDialog(null, "Devi inserire un indirizzo ip e una porta", "Errore", JOptionPane.ERROR_MESSAGE);
-								}
-							}else {
-								JOptionPane.showMessageDialog(null, "La stringa deve contenere solo cifre", "Errore", JOptionPane.ERROR_MESSAGE);
-							}
-						}else {
-							JOptionPane.showMessageDialog(null, "La chiave deve essere maggiore di 1", "Errore", JOptionPane.ERROR_MESSAGE);
+						if(s.getIp() != null || s.getPorta() != 0) {
+							/*
+							 * GOOD ENDING
+							 * Tutte le condizioni sono andate a buon fine, adesso si procede per l'invio
+							 * del messaggio
+							 */
+							s.invioMessaggio();
+							System.out.println("Invio del messaggio al destinatario specificato");
 						}
 					}else {
-						JOptionPane.showMessageDialog(null, "Il codice dell'agente può essere solo di 4 cifre", "Errore", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(null, "La stringa deve contenere solo cifre", "Errore", JOptionPane.ERROR_MESSAGE);
 					}
 				}else {
-					JOptionPane.showMessageDialog(null, "Il messaggio è troppo lungo", "Errore", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, "La chiave deve essere maggiore di 1", "Errore", JOptionPane.ERROR_MESSAGE);
 				}
 			}else {
 				JOptionPane.showMessageDialog(null, "Non hai inserito alcun messaggio", "Errore", JOptionPane.ERROR_MESSAGE);

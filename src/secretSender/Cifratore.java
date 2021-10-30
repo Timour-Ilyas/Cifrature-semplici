@@ -1,3 +1,6 @@
+/*
+ * Classe dedita al calcolo della cifratura con l'algoritmo di riferimento scelto
+ */
 package secretSender;
 import java.util.LinkedList;
 
