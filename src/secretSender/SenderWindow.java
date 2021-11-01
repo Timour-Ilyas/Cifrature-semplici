@@ -19,7 +19,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 
-public class SenderWindow extends JFrame implements ActionListener{
+public class SenderWindow extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1917L;
 
 	/*
@@ -53,11 +53,20 @@ public class SenderWindow extends JFrame implements ActionListener{
 	private JButton invioMessaggio;
 
 	private IpPortWindow piccolaFinestraDiInput;
-
+	
+	/*
+	 * Variabili di cifratura e connessione socket
+	 */
 	private Cifratore macchinaCifratrice  = new Cifratore();
 
 	private SenderSocket s;
-
+	
+	/*
+	 * Costruttore in cui 
+	 * 		Si cambia il nome della finestra
+	 * 		Si imposta la finestra 
+	 * 		Si inizializza la socket
+	 */
 	public SenderWindow() throws SocketException {
 		super("SecretSender");
 		initComponents();

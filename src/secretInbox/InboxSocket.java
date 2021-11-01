@@ -1,7 +1,7 @@
 /*
- * La classe gestisce la socket del SecretSender
+ * La classe gestisce la socket dell'InboxSender
  */
-package secretSender;
+package secretInbox;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -10,16 +10,18 @@ import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class SenderSocket {
+import secretSender.SenderSocket;
+
+public class InboxSocket {
 	
 	/*
-	 * La variabile socket che comunicherà con il programma Inbox
+	 *  La variabile socket che comunicherà con il programma Sender
 	 */
 	private static DatagramSocket socket;
 	/*
 	 * La porta della propria socket aperta, la variabile si usa unicamente nel costruttore
 	 */
-	private int portaPropria = 50001;
+	private int portaPropria = 50000;
 	/*
 	 * Dati necessari alla comunicazione, il messaggio da inviare, l'ip e la porta
 	 */
@@ -34,22 +36,22 @@ public class SenderSocket {
 	 * Variabili utilizzate per ricevere il messaggio di risposta dal destinatario
 	 */
 	private byte buf[] = new byte[64];
-	private DatagramPacket pacchettoDaRicezione  = new DatagramPacket(buf,buf.length);
-	private String risposta;
-
-
-	public SenderSocket() throws SocketException {
+	private DatagramPacket pacchettoDaRicezione = new DatagramPacket(buf,buf.length);
+	private String messaggioRicevuto;
+	
+	public InboxSocket() throws SocketException {
 		socket = new DatagramSocket(portaPropria);
+		setMsg("Messaggio ricevuto");
 	}
 
 	/*
 	 * Getter e setter
 	 */
-	public String getRisposta() {
-		return risposta;
+	public String getMessaggioRicevuto() {
+		return messaggioRicevuto;
 	}
-	public void setRisposta(String risposta) {
-		this.risposta = risposta;
+	public void setMessaggioRicevuto(String messaggioRicevuto) {
+		this.messaggioRicevuto = messaggioRicevuto;
 	}
 	public InetAddress getIp() {
 		return ip;
@@ -69,25 +71,25 @@ public class SenderSocket {
 	public void setMsg(String msg) {
 		this.msg = msg;
 	}
-
+	
 	/*
-	 * Metodo che invia il messaggio al destinatario specificato dai dati inseriti
-	 * Se non sono stati impostati i dati, non viene utilizzato il metodo
+	 * Metodo che riceve il messaggio al mittente
 	 */
-	public void invioMessaggio() {
+	public void riceviMessaggio() {
 		try 
-		{
-			dp = new DatagramPacket(msg.getBytes(),msg.getBytes().length,ip,porta);
-
-			socket.send(dp);
-			
+		{	
 			socket.receive(pacchettoDaRicezione);
 			
-			risposta = new String(pacchettoDaRicezione.getData(), 0, pacchettoDaRicezione.getData().length);
+			messaggioRicevuto = new String(pacchettoDaRicezione.getData(), 0, pacchettoDaRicezione.getData().length);
 			
+			setIp(pacchettoDaRicezione.getAddress());
+			setPorta(pacchettoDaRicezione.getPort());
+			
+			dp = new DatagramPacket(msg.getBytes(),msg.getBytes().length,ip,porta);
+			
+			socket.send(dp);
 		} catch (IOException e) {
 			Logger.getLogger(SenderSocket.class.getName()).log(Level.SEVERE, null, e);			
 		}
-		
 	}
 }

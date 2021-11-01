@@ -13,6 +13,7 @@ import java.awt.event.ActionListener;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -50,6 +51,7 @@ public class IpPortWindow extends JFrame implements ActionListener{
 		super("Dati del Quartier Generale");
 		initComponentsIpPorta();
 		setResizable(false);		
+		setAlwaysOnTop(true);
 	}
 
 	private void initComponentsIpPorta() {

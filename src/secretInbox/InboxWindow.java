@@ -26,6 +26,11 @@ public class InboxWindow extends JFrame implements ActionListener{
 	private JPanel pannelloSubInferiore;
 	private JLabel titolo;
 
+	/*
+	 * Costruttore in cui 
+	 * 		Si cambia il nome della finestra
+	 * 		Si imposta la finestra 
+	 */
 	public InboxWindow() {
 		super("SecretInbox");
 		initComponents();
@@ -48,7 +53,7 @@ public class InboxWindow extends JFrame implements ActionListener{
 		getContentPane().add(pannelloSubInferiore, BorderLayout.CENTER);
 
 	}
-
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 

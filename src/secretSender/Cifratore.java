@@ -67,7 +67,7 @@ public class Cifratore {
 		 * Ciò serve anche per controllare che l'input inserito
 		 * sia stato salvato nella maniera corretta
 		 */
-		System.out.println(messaggioDaCifrare);
+		System.out.println("Messaggio da cifrare: " + messaggioDaCifrare);
 
 		/*
 		 * La chiave di cifratura è una variabile che può contenere un qualunque
@@ -89,29 +89,55 @@ public class Cifratore {
 			listaDaCifrare.add(i, messaggioDaCifrare.charAt(i));
 		}
 
+		/*
+		 * Inizio della cifratura
+		 * Il ciclo for dura fintantoché  ogni lettera verrà cifrata
+		 */
 		for(int i = 0; i < listaDaCifrare.size(); i++) {
+			/*
+			 * Fase di controllo sulla caratteristica della lettera di essere
+			 * maiuscola o minuscola. All'inizio viene salvato tale dato
+			 * successivamente la lettera viene resa momentaneamente maiuscola
+			 */
 			upperCase = Character.isUpperCase(listaDaCifrare.get(i));
 
 			listaDaCifrare.set(i, Character.toUpperCase(listaDaCifrare.get(i)));
-
+			
+			/*
+			 * Viene salvato il valore ASCII della lettera in cui la lettera deve essere trasformata
+			 */
 			numeroSommatoreAscii = (int) listaDaCifrare.get(i) + chiave;
-
+			
+			/*
+			 * Se il nuovo valore ASCII supera 90 (valore ASCII della "Z") significa che deve ripartire
+			 * dall'inizio dell'alfabeto, facendo quindi un "-26"
+			 */
 			if(numeroSommatoreAscii > 90)
 				numeroSommatoreAscii -= 26;
-
+			
+			/*
+			 * Conversione del valore ASCII in carattere
+			 */
 			listaDaCifrare.set(i,(char) numeroSommatoreAscii);
-
+			
+			/*
+			 * Se la lettera in origine era minuscola, la lettera convertita diventa minuscola
+			 */
 			if(upperCase) {
 				Character.toLowerCase(listaDaCifrare.get(i));
 			}
 		}
-
+		
+		/*
+		 * La lista di caratteri viene trasformata in una Stringa
+		 */
 		messaggioCifrato = "";
 		for(int i = 0; i < listaDaCifrare.size(); i++) {
 			messaggioCifrato = messaggioCifrato + listaDaCifrare.get(i);
 		}
-
-		System.out.println(messaggioCifrato);
+		
+		//Stampa del messaggio cifrato
+		System.out.println("Messaggio cifrato: " + messaggioCifrato);
 
 		return messaggioCifrato;
 	}
@@ -132,14 +158,19 @@ public class Cifratore {
 		 * Ciò serve anche per controllare che l'input inserito
 		 * sia stato salvato nella maniera corretta
 		 */
-		System.out.println(messaggioDaCifrare);
-
+		System.out.println("Messaggio da cifrare: " + messaggioDaCifrare);
+		
+		/*
+		 * Inserimento del messaggio da cifrare, da una stringa ad una lista
+		 * ciò semplicifica le operazioni di cifratura 
+		 */
 		for(int i = 0; i < messaggioDaCifrare.length(); i++) {
 			listaDaCifrare.add(i, messaggioDaCifrare.charAt(i));
 		}
-
-
 		
+
+
+
 		return messaggioCifrato;
 	}
 }
