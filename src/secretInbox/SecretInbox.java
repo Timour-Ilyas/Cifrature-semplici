@@ -32,12 +32,12 @@ public class SecretInbox {
 		Decifratore macchinaDecifratrice = new Decifratore();
 
 		InboxSocket s = new InboxSocket();
-		
+
 		/*
 		 * Impostazione dell'icona della notifica
 		 */
 		ImageIcon iconaAgenteSegreto = new ImageIcon("src/secretInbox/Immagini/SmallSecretAgentIcon.png");
-		
+
 		//Si attende che arrivi un messaggio
 		for(;;){
 			s.riceviMessaggio();
@@ -48,13 +48,10 @@ public class SecretInbox {
 			NotificaMessaggio.clessidra(3).start();
 			NotificaMessaggio.suonoNotifica("src/secretInbox/Suoni/NotificationSoundEffect.wav");
 			JOptionPane.showMessageDialog(null, "È appena arrivato un messaggio", "Nuova notifica", JOptionPane.INFORMATION_MESSAGE, iconaAgenteSegreto);
-			
+
 			System.out.println("È appena arrivato un messaggio");
-			
-			
+
+
 		}//Fine del ciclo infinito	
 	}
-
-	
-
 }

@@ -10,8 +10,8 @@ import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class SenderSocket {
-	
+public class SenderSocket extends Thread{
+
 	/*
 	 * La variabile socket che comunicherà con il programma Inbox
 	 */
@@ -35,8 +35,9 @@ public class SenderSocket {
 	 */
 	private byte buf[] = new byte[64];
 	private DatagramPacket pacchettoDaRicezione  = new DatagramPacket(buf,buf.length);
-	private String risposta;
+	private String risposta = "null";
 
+	private boolean ripetizione = true;
 
 	public SenderSocket() throws SocketException {
 		socket = new DatagramSocket(portaPropria);
@@ -75,19 +76,49 @@ public class SenderSocket {
 	 * Se non sono stati impostati i dati, non viene utilizzato il metodo
 	 */
 	public void invioMessaggio() {
-		try 
-		{
+		try {
 			dp = new DatagramPacket(msg.getBytes(),msg.getBytes().length,ip,porta);
-
 			socket.send(dp);
-			
-			socket.receive(pacchettoDaRicezione);
-			
-			risposta = new String(pacchettoDaRicezione.getData(), 0, pacchettoDaRicezione.getData().length);
-			
 		} catch (IOException e) {
 			Logger.getLogger(SenderSocket.class.getName()).log(Level.SEVERE, null, e);			
 		}
-		
 	}
+	
+	/*
+	 * Viene avviato un thread che rimane sempre attivo in ascolto ad attendere l'arrivo di un messaggio
+	 * La socket attiva che ascolta viene chiusua dall'interno in modo che alla chiusura del programma la socket non si ancora aperta
+	 */
+	public void run() {
+		while(ripetizione) {
+			try {
+				socket.receive(pacchettoDaRicezione);
+				risposta = new String(pacchettoDaRicezione.getData(), 0, pacchettoDaRicezione.getData().length).trim();
+				
+				if(!risposta.contains("termina")){
+					System.out.println("Il messaggio è arrivato al destinatario");
+				}
+				if(risposta.contains("termina")){
+					socket.close();
+					System.out.println("Termine programma");
+					System.exit(0);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}//Chiusura Try Catch
+		}//Chiusura ciclo while
+	}//Chiusura metodo run
+	
+	/*
+	 * Metodo che chiude il thread della socket che rimane in ascolto
+	 */
+	public void terminaSocket() {
+		try {
+			String termina = "termina";
+			dp = new DatagramPacket(termina.getBytes(),termina.getBytes().length,InetAddress.getByName("Localhost") , socket.getLocalPort());
+			socket.send(dp);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		ripetizione = false;
+	}//Chiusura metodo di terminazione socket
 }

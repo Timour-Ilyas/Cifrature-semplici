@@ -4,20 +4,21 @@
 package secretSender;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.net.SocketException;
+import java.util.concurrent.TimeUnit;
+
 import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import java.awt.Font;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
+
 
 public class SenderWindow extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1917L;
@@ -26,15 +27,12 @@ public class SenderWindow extends JFrame implements ActionListener {
 	 * Variabili per l'intefaccia grafica
 	 */
 	private int x = 300, y = 10, larghezza = 1000, lunghezza = 800;
-	private JPanel superioreTitolo;
-	private JPanel pannelloPerTestoDaCifrare;
-	private JPanel pannelloFrattoTre;
-	private JPanel inferioreInput;
-	private JPanel pannelloSubInferiore;
 
 	private JLabel titolo;
 
-	private JTextPaneLimit testoDaCifraCampo;
+	private JScrollPane paneScroller;
+
+	private JTextArea testoDaCifraCampo;
 
 	private JLabel contatoreCaratteri;
 
@@ -53,14 +51,18 @@ public class SenderWindow extends JFrame implements ActionListener {
 	private JButton invioMessaggio;
 
 	private IpPortWindow piccolaFinestraDiInput;
-	
+
+	private JLabel sfondo;
+
+	private JButton pulsanteArchivio;
+
 	/*
 	 * Variabili di cifratura e connessione socket
 	 */
 	private Cifratore macchinaCifratrice  = new Cifratore();
 
 	private SenderSocket s;
-	
+
 	/*
 	 * Costruttore in cui 
 	 * 		Si cambia il nome della finestra
@@ -71,20 +73,33 @@ public class SenderWindow extends JFrame implements ActionListener {
 		super("SecretSender");
 		initComponents();
 
+		/*
+		 * Chiamata costruttore della Socket
+		 * 	Start del Thread di ascolto
+		 */
 		s = new SenderSocket();
+		s.start();
+
+		/*
+		 * Fare in modo che quando il programma termina viene chiusa la socket
+		 */
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+
+		addWindowListener( new WindowAdapter()
+		{
+			public void windowClosing(WindowEvent e)
+			{
+				s.terminaSocket();
+				dispose();
+			}
+		});
 	}
 
 	private void initComponents() {
 		/*
 		 * Inizializzazione dei componenti
 		 */
-		superioreTitolo = new JPanel();
-		pannelloPerTestoDaCifrare = new JPanel();
-		pannelloFrattoTre = new JPanel();
-		inferioreInput = new JPanel();
-		pannelloSubInferiore = new JPanel();
 		titolo = new JLabel();
-		testoDaCifraCampo = new JTextPaneLimit();
 		scrittaPerCodiceNumerico = new JLabel();
 		codiceNumericoCampo = new JTextField(3);
 		scrittaPerChiave = new JLabel();
@@ -93,55 +108,76 @@ public class SenderWindow extends JFrame implements ActionListener {
 		contatoreCaratteri = new JLabel();
 		pulsanteDiConnessione = new JButton();
 		invioMessaggio = new JButton();
+		sfondo = new JLabel();
+		pulsanteArchivio = new JButton();
+		paneScroller = new JScrollPane();
+		testoDaCifraCampo = new JTextArea();
 
 		setBounds(x, y, larghezza, lunghezza);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-		titolo.setText("SecretSender");
-		titolo.setFont(new Font("Bold",70,70));
-		contatoreCaratteri.setText("512");
-		contatoreCaratteri.setForeground(Color.GREEN);
+		getContentPane().setLayout(null);
 
+		pulsanteArchivio.setText("Archivio Dati");
+
+		getContentPane().add(pulsanteArchivio);
+		pulsanteArchivio.setBounds(860, 680, 110, 30);
+
+		pulsanteDiConnessione.setFont(new java.awt.Font("Tahoma", 0, 14));
 		pulsanteDiConnessione.setText("Impostazioni connessione");
+
+		getContentPane().add(pulsanteDiConnessione);
+		pulsanteDiConnessione.setBounds(320, 620, 210, 30);
+
+		invioMessaggio.setFont(new java.awt.Font("Tahoma", 0, 14));
 		invioMessaggio.setText("Invio messaggio");
 
-		scrittaPerCodiceNumerico.setText("Codice agente ");
+		getContentPane().add(invioMessaggio);
+		invioMessaggio.setBounds(580, 620, 150, 30);
+
+		testoDaCifraCampo.setColumns(20);
+		testoDaCifraCampo.setRows(5);
+		paneScroller.setViewportView(testoDaCifraCampo);
+
+		getContentPane().add(paneScroller);
+		paneScroller.setBounds(300, 140, 430, 180);
+
+		getContentPane().add(codiceNumericoCampo);
+		codiceNumericoCampo.setBounds(530, 370, 40, 30);
 		codiceNumericoCampo.setDocument(new JTextLimit(4));
+		getContentPane().add(chiaveCampo);
+		chiaveCampo.setBounds(470, 440, 160, 30);
 
-		scrittaPerChiave.setText("Chiave ");
 
+		scrittaPerChiave.setFont(new java.awt.Font("Tahoma", 0, 17));
+		scrittaPerChiave.setText("Chiave:");
+		getContentPane().add(scrittaPerChiave);
+		scrittaPerChiave.setBounds(410, 440, 90, 30);
+
+		scrittaPerCodiceNumerico.setFont(new java.awt.Font("Tahoma", 0, 17));
+		scrittaPerCodiceNumerico.setText("Codice agente:");
+		getContentPane().add(scrittaPerCodiceNumerico);
+		scrittaPerCodiceNumerico.setBounds(410, 370, 120, 30);
+
+		getContentPane().add(metodoDiCifratura);
+		metodoDiCifratura.setBounds(440, 510, 210, 40);
 		metodoDiCifratura.setModel(new DefaultComboBoxModel<>(new String[] { "Cifrario di Cesare", "Cifrario di Vigenère"}));
 
-		/*
-		 * Inserimento componenti nel JFrame
-		 */
-		superioreTitolo.add(titolo);
+		titolo.setFont(new java.awt.Font("Tahoma", 1, 70));
+		titolo.setText("SecretSender");
+		titolo.setToolTipText("");
+		titolo.setPreferredSize(new java.awt.Dimension(80, 20));
+		getContentPane().add(titolo);
+		titolo.setBounds(270, 0, 480, 110);
 
-		testoDaCifraCampo.setPreferredSize(new Dimension(400, 200));
+		contatoreCaratteri.setFont(new java.awt.Font("Tahoma", 0, 13));
+		contatoreCaratteri.setText("512");
+		getContentPane().add(contatoreCaratteri);
+		contatoreCaratteri.setBounds(740, 300, 40, 20);
 
-		pannelloFrattoTre.add(testoDaCifraCampo, BorderLayout.CENTER);
-		pannelloFrattoTre.add(contatoreCaratteri, BorderLayout.CENTER);
-
-		pannelloPerTestoDaCifrare.add(pannelloFrattoTre);
-
-		codiceNumericoCampo.setPreferredSize(new Dimension(20, 50));
-		chiaveCampo.setPreferredSize(new Dimension(200, 50));
-		metodoDiCifratura.setPreferredSize(new Dimension(300, 50));
-
-		inferioreInput.add(scrittaPerCodiceNumerico);
-		inferioreInput.add(codiceNumericoCampo);
-		inferioreInput.add(scrittaPerChiave);
-		inferioreInput.add(chiaveCampo);
-		inferioreInput.add(metodoDiCifratura);
-		inferioreInput.add(pulsanteDiConnessione);
-		inferioreInput.add(invioMessaggio);	
-
-		pannelloSubInferiore.setLayout(new BoxLayout(pannelloSubInferiore, BoxLayout.PAGE_AXIS));
-		pannelloSubInferiore.add(pannelloPerTestoDaCifrare);
-		pannelloSubInferiore.add(inferioreInput);
-
-		getContentPane().add(superioreTitolo, BorderLayout.NORTH);
-		getContentPane().add(pannelloSubInferiore, BorderLayout.CENTER);
+		sfondo.setIcon(new javax.swing.ImageIcon("src/secretSender/Immagini/SfondoSender.png"));
+		sfondo.setText("jLabel3");
+		getContentPane().add(sfondo);
+		sfondo.setBounds(0, -40, 1000, 820);
 
 		/*
 		 * Attivazione ActionListener
@@ -205,40 +241,62 @@ public class SenderWindow extends JFrame implements ActionListener {
 			pulsanteDiConnessione.setEnabled(false);
 			invioMessaggio.setEnabled(false);
 
-			//Se il testo non è vuoto)
-			if(!testoDaCifraCampo.getText().isBlank()){//Se il testo non è vuoto
-				if(Integer.parseInt(chiaveCampo.getText()) > 1){//Se la chiave è maggiore di 1
-					if(osservatoreSpeciale(codiceNumericoCampo.getText())){//Se la stringa contiene solo cifre								
-						/*
-						 * Cifratura del messaggio
-						 */
-						macchinaCifratrice.cifraturaDiCesare(testoDaCifraCampo.getText(), codiceNumericoCampo.getText(), Integer.parseInt(chiaveCampo.getText()));
+			if(!testoDaCifraCampo.getText().isEmpty()){//Se il testo non è vuoto
+				if(!codiceNumericoCampo.getText().isEmpty()){//Se il codice agente non è vuoto
+					if(osservatoreSpeciale(codiceNumericoCampo.getText())){//Se il codice agente contiene solo cifre
+						if(!chiaveCampo.getText().isEmpty()){//Se la chiave non è vuota
+							if(Integer.parseInt(chiaveCampo.getText()) > 1){//Se la chiave è maggiore di 1
+								/*
+								 * Cifratura del messaggio
+								 */
+								macchinaCifratrice.cifraturaDiCesare(testoDaCifraCampo.getText(), codiceNumericoCampo.getText(), Integer.parseInt(chiaveCampo.getText()));
 
-						System.out.println("Cifratura del messaggio completata, metodo di Cesare");
+								System.out.println("Cifratura del messaggio completata, metodo di Cesare");
 
-						s.setMsg(testoDaCifraCampo.getText());
+								s.setMsg(testoDaCifraCampo.getText());
 
-						try{
-							s.setIp(piccolaFinestraDiInput.restituisci(s.getIp()));
-							s.setPorta(piccolaFinestraDiInput.restituisci(s.getPorta()));
-						}catch(NullPointerException e) {
-							JOptionPane.showMessageDialog(null, "Devi inserire un indirizzo ip e una porta", "Errore", JOptionPane.ERROR_MESSAGE);	
-						}
+								try{
+									s.setIp(piccolaFinestraDiInput.restituisci(s.getIp()));
+									s.setPorta(piccolaFinestraDiInput.restituisci(s.getPorta()));
+								}catch(NullPointerException e) {
+									JOptionPane.showMessageDialog(null, "Devi inserire un indirizzo ip e una porta", "Errore", JOptionPane.ERROR_MESSAGE);	
+								}
 
-						if(s.getIp() != null || s.getPorta() != 0) {
-							/*
-							 * GOOD ENDING
-							 * Tutte le condizioni sono andate a buon fine, adesso si procede per l'invio
-							 * del messaggio
-							 */
-							s.invioMessaggio();
-							System.out.println("Invio del messaggio al destinatario specificato");
+								if(s.getIp() != null || s.getPorta() != 0) {
+									/*
+									 * GOOD ENDING
+									 * Tutte le condizioni sono andate a buon fine, adesso si procede per l'invio
+									 * del messaggio
+									 */
+									s.invioMessaggio();
+									System.out.println("Invio del messaggio al destinatario specificato");
+
+									/*
+									 * Attesa di 2 secondi per osservare se il messaggio arriva al destinatario
+									 */
+									try {
+										TimeUnit.SECONDS.sleep(2);
+									} catch (InterruptedException e) {
+										e.printStackTrace();
+									}
+
+									if(s.getRisposta() == "null") {
+										JOptionPane.showMessageDialog(null, "L'utente non esiste o non è attualmente raggiungibile", "Problema di connessione", JOptionPane.WARNING_MESSAGE);
+										System.out.println("Non è possibile raggiungere il destinatario");
+										s.setRisposta("null");
+									}
+								}
+							}else {
+								JOptionPane.showMessageDialog(null, "Inserisci una chiave maggiore di 1", "Errore", JOptionPane.ERROR_MESSAGE);
+							}
+						}else {
+							JOptionPane.showMessageDialog(null, "Non inserito una chiave", "Errore", JOptionPane.ERROR_MESSAGE);
 						}
 					}else {
-						JOptionPane.showMessageDialog(null, "La stringa deve contenere solo cifre", "Errore", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(null, "Il codice agente deve contenere solo cifre", "Errore", JOptionPane.ERROR_MESSAGE);
 					}
 				}else {
-					JOptionPane.showMessageDialog(null, "La chiave deve essere maggiore di 1", "Errore", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Non hai inserito il tuo codice agente", "Errore", JOptionPane.ERROR_MESSAGE);
 				}
 			}else {
 				JOptionPane.showMessageDialog(null, "Non hai inserito alcun messaggio", "Errore", JOptionPane.ERROR_MESSAGE);

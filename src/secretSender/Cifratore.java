@@ -136,6 +136,12 @@ public class Cifratore {
 			messaggioCifrato = messaggioCifrato + listaDaCifrare.get(i);
 		}
 		
+		/*
+		 * Vengono rimossi tutti gli elementi della lista perché se no alla successiva conversione
+		 * avrebbe lasciato gli elementi di tutte le conversioni precedenti
+		 */
+		listaDaCifrare.removeAll(listaDaCifrare);
+		
 		//Stampa del messaggio cifrato
 		System.out.println("Messaggio cifrato: " + messaggioCifrato);
 

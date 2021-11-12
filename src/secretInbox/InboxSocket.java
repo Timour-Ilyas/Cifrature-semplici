@@ -9,11 +9,10 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import secretSender.SenderSocket;
 
 public class InboxSocket {
-	
+
 	/*
 	 *  La variabile socket che comunicherà con il programma Sender
 	 */
@@ -38,10 +37,10 @@ public class InboxSocket {
 	private byte buf[] = new byte[64];
 	private DatagramPacket pacchettoDaRicezione = new DatagramPacket(buf,buf.length);
 	private String messaggioRicevuto;
-	
+
 	public InboxSocket() throws SocketException {
 		socket = new DatagramSocket(portaPropria);
-		setMsg("Messaggio ricevuto");
+		setMsg("ok");
 	}
 
 	/*
@@ -71,25 +70,34 @@ public class InboxSocket {
 	public void setMsg(String msg) {
 		this.msg = msg;
 	}
-	
+
 	/*
-	 * Metodo che riceve il messaggio al mittente
+	 * Metodo che riceve il messaggio dal mittente
 	 */
 	public void riceviMessaggio() {
 		try 
-		{	
+		{
 			socket.receive(pacchettoDaRicezione);
-			
+
 			messaggioRicevuto = new String(pacchettoDaRicezione.getData(), 0, pacchettoDaRicezione.getData().length);
-			
+
 			setIp(pacchettoDaRicezione.getAddress());
 			setPorta(pacchettoDaRicezione.getPort());
 			
 			dp = new DatagramPacket(msg.getBytes(),msg.getBytes().length,ip,porta);
-			
+
 			socket.send(dp);
 		} catch (IOException e) {
 			Logger.getLogger(SenderSocket.class.getName()).log(Level.SEVERE, null, e);			
 		}
 	}
+	
+	/*
+	 * Metodo che chiude il thread della socket che rimane in ascolto
+	 */
+	public static void terminaSocket() {
+		socket.close();
+		System.out.println("Termine programma");
+		System.exit(0);
+	}//Chiusura metodo di terminazione socket
 }

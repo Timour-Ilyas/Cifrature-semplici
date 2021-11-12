@@ -130,7 +130,13 @@ public class Decifratore {
 		for(int i = 0; i < listaDaDecifrare.size(); i++) {
 			messaggioDecifrato = messaggioDecifrato + listaDaDecifrare.get(i);
 		}
-
+		
+		/*
+		 * Vengono rimossi tutti gli elementi della lista perché se no alla successiva conversione
+		 * avrebbe lasciato gli elementi di tutte le conversioni precedenti
+		 */
+		listaDaDecifrare.removeAll(listaDaDecifrare);
+		
 		//Stampa del messaggio cifrato
 		System.out.println("Messaggio decifrato: " + messaggioDecifrato);
 
