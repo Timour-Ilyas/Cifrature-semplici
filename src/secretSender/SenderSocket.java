@@ -1,4 +1,5 @@
 /*
+
  * La classe gestisce la socket del SecretSender
  */
 package secretSender;
@@ -34,7 +35,7 @@ public class SenderSocket extends Thread{
 	 * Variabili utilizzate per ricevere il messaggio di risposta dal destinatario
 	 */
 	private byte buf[] = new byte[64];
-	private DatagramPacket pacchettoDaRicezione  = new DatagramPacket(buf,buf.length);
+	private DatagramPacket pacchettoDaRicezione;
 	private String risposta = "null";
 
 	private boolean ripetizione = true;
@@ -91,6 +92,8 @@ public class SenderSocket extends Thread{
 	public void run() {
 		while(ripetizione) {
 			try {
+				for(int k = 0; k < buf.length; k++) buf[k] = 0;
+				pacchettoDaRicezione  = new DatagramPacket(buf,buf.length);
 				socket.receive(pacchettoDaRicezione);
 				risposta = new String(pacchettoDaRicezione.getData(), 0, pacchettoDaRicezione.getData().length).trim();
 				

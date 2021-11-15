@@ -11,7 +11,7 @@
 
  ** in output: Messaggio cifrato
 
- ** Osservazioni: Il programma contiene 7 classi
+ ** Osservazioni: Il programma contiene 8 classi
 				  Il programma utilizza socket UDP, quindi non è certo che il messaggio
 				  arrivi al destinatario, è stato pensato un metodo per accertarsi che
 				  il messaggio sia arrivato al destinatario

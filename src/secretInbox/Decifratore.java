@@ -7,11 +7,6 @@ import java.util.LinkedList;
 
 public class Decifratore {
 	/*
-	 * Variabile Stringa che contiene il contenuto completo da decifrare
-	 * 		Esso contiene il codice dell'agente segreto e il messaggio ricevuto
-	 */
-	private String messaggioDaDecifrare;
-	/*
 	 * Varibaile lista che ha il contenuto equivalente del messaggio da decifrare
 	 * La funzione della lista è quella di poter lavorare facilmente con il
 	 * contenuto del singolo nodo della lista.
@@ -28,7 +23,7 @@ public class Decifratore {
 	 * variabile booleana che serve a salvare l'informazione in merito al fatto che la
 	 * lettera sia minuscola o maiuscola
 	 */
-	private Boolean upperCase;
+	private Boolean downerCase;
 	/*
 	 * Variabile di appoggio che salva in codice ASCII la chiave,
 	 * successivamente si va a sottrare questo valore alla lettera della stringa,
@@ -39,12 +34,6 @@ public class Decifratore {
 	/*
 	 * Getter e setter
 	 */
-	public String getMessaggioDaDecifrare() {
-		return messaggioDaDecifrare;
-	}
-	public void setMessaggioDaDecifrare(String messaggioDaDecifrare) {
-		this.messaggioDaDecifrare = messaggioDaDecifrare;
-	}
 	public String getMessaggioDecifrato() {
 		return messaggioDecifrato;
 	}
@@ -56,13 +45,13 @@ public class Decifratore {
 	 * Primo metodo di decifratura
 	 * metodo usato per cifrare il messaggio: Cifratura di Cesare
 	 */
-	public String decifraturaDiCesare(String testo, String codiceNumerico, int chiave) {
+	public String decifraturaDiCesare(String testo, int chiave) {
 		/*
 		 * Stampa del messaggio prima di attuare la decifratura
 		 * Ciò serve anche per controllare che l'input inserito
 		 * sia stato salvato nella maniera corretta
 		 */
-		System.out.println("Messaggio da decifrare: " + messaggioDaDecifrare);
+		System.out.println("Messaggio da decifrare: " + testo);
 
 		/*
 		 * La chiave di decifratura è una variabile che può contenere un qualunque
@@ -71,17 +60,16 @@ public class Decifratore {
 		 * è stata già eseguita dalla classe "InboxWindow", esso impone che il
 		 * numero debba essere strettamente maggiore di 1
 		 */
-		if(chiave > 26) {
-			chiave %= 26;
-			chiave++;
+		if(chiave > 255) {
+			chiave %= 255;
 		}
 
 		/*
 		 * Inserimento del messaggio da decifrare, da una stringa ad una lista
 		 * ciò semplicifica le operazioni di decifratura 
 		 */
-		for(int i = 0; i < messaggioDaDecifrare.length(); i++) {
-			listaDaDecifrare.add(i, messaggioDaDecifrare.charAt(i));
+		for(int i = 0; i < testo.length(); i++) {
+			listaDaDecifrare.add(i, testo.charAt(i));
 		}
 
 		/*
@@ -94,7 +82,7 @@ public class Decifratore {
 			 * maiuscola o minuscola. All'inizio viene salvato tale dato
 			 * successivamente la lettera viene resa momentaneamente maiuscola
 			 */
-			upperCase = Character.isUpperCase(listaDaDecifrare.get(i));
+			downerCase = Character.isUpperCase(listaDaDecifrare.get(i));
 
 			listaDaDecifrare.set(i, Character.toUpperCase(listaDaDecifrare.get(i)));
 
@@ -105,10 +93,10 @@ public class Decifratore {
 
 			/*
 			 * Se il nuovo valore ASCII supera 65 (valore ASCII della "A") significa che deve ripartire
-			 * dalla fine dell'alfabeto, facendo quindi un "+25"
+			 * dalla fine dell'alfabeto, facendo quindi un "+26"
 			 */
 			if(numeroSommatoreAscii > 65)
-				numeroSommatoreAscii += 25;
+				numeroSommatoreAscii -= 26;
 
 			/*
 			 * Conversione del valore ASCII in carattere
@@ -118,9 +106,8 @@ public class Decifratore {
 			/*
 			 * Se la lettera in origine era minuscola, la lettera convertita diventa minuscola
 			 */
-			if(upperCase) {
-				Character.toLowerCase(listaDaDecifrare.get(i));
-			}
+			if(downerCase)
+				listaDaDecifrare.set(i, Character.toUpperCase(listaDaDecifrare.get(i)));
 		}
 
 		/*
@@ -130,13 +117,13 @@ public class Decifratore {
 		for(int i = 0; i < listaDaDecifrare.size(); i++) {
 			messaggioDecifrato = messaggioDecifrato + listaDaDecifrare.get(i);
 		}
-		
+
 		/*
 		 * Vengono rimossi tutti gli elementi della lista perché se no alla successiva conversione
 		 * avrebbe lasciato gli elementi di tutte le conversioni precedenti
 		 */
 		listaDaDecifrare.removeAll(listaDaDecifrare);
-		
+
 		//Stampa del messaggio cifrato
 		System.out.println("Messaggio decifrato: " + messaggioDecifrato);
 
@@ -147,20 +134,20 @@ public class Decifratore {
 	 * Secondo metodo di decifratura
 	 * metodo usato per cifrare il messaggio: Cifratura di Vigenère
 	 */
-	public String cifraturaDiVigenère(String testo, String codiceNumerico, int chiave) {
+	public String decifraturaDiVigenère(String testo, String chiave) {
 		/*
 		 * Stampa del messaggio prima di attuare la decifratura
 		 * Ciò serve anche per controllare che l'input inserito
 		 * sia stato salvato nella maniera corretta
 		 */
-		System.out.println("Messaggio da decifrare: " + messaggioDaDecifrare);
-		
+		System.out.println("Messaggio da decifrare: " + testo);
+
 		/*
 		 * Inserimento del messaggio da decifrare, da una stringa ad una lista
 		 * ciò semplicifica le operazioni di cifratura 
 		 */
-		for(int i = 0; i < messaggioDaDecifrare.length(); i++) {
-			listaDaDecifrare.add(i, messaggioDaDecifrare.charAt(i));
+		for(int i = 0; i < testo.length(); i++) {
+			listaDaDecifrare.add(i, testo.charAt(i));
 		}
 
 

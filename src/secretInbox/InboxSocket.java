@@ -7,9 +7,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import secretSender.SenderSocket;
 
 public class InboxSocket {
 
@@ -37,6 +34,8 @@ public class InboxSocket {
 	private byte buf[] = new byte[64];
 	private DatagramPacket pacchettoDaRicezione = new DatagramPacket(buf,buf.length);
 	private String messaggioRicevuto;
+	
+	public static boolean accettazione = true;
 
 	public InboxSocket() throws SocketException {
 		socket = new DatagramSocket(portaPropria);
@@ -77,6 +76,8 @@ public class InboxSocket {
 	public void riceviMessaggio() {
 		try 
 		{
+			for(int k = 0; k < buf.length; k++) buf[k] = 0;
+			pacchettoDaRicezione  = new DatagramPacket(buf,buf.length);
 			socket.receive(pacchettoDaRicezione);
 
 			messaggioRicevuto = new String(pacchettoDaRicezione.getData(), 0, pacchettoDaRicezione.getData().length);
@@ -87,9 +88,7 @@ public class InboxSocket {
 			dp = new DatagramPacket(msg.getBytes(),msg.getBytes().length,ip,porta);
 
 			socket.send(dp);
-		} catch (IOException e) {
-			Logger.getLogger(SenderSocket.class.getName()).log(Level.SEVERE, null, e);			
-		}
+		} catch (IOException e) {}
 	}
 	
 	/*
@@ -98,6 +97,7 @@ public class InboxSocket {
 	public static void terminaSocket() {
 		socket.close();
 		System.out.println("Termine programma");
+		accettazione = false;
 		System.exit(0);
 	}//Chiusura metodo di terminazione socket
 }

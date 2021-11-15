@@ -11,7 +11,7 @@
 
  ** in output: Messaggio decifrato
 
- ** Osservazioni: Il programma contiene 5 classi
+ ** Osservazioni: Il programma contiene 6 classi
 				  Dato che il programma riceve il messaggio utilizzando socket UDP,
 				  dopo aver ricevuto il messaggio, invia un accertamento
  */
@@ -27,10 +27,8 @@ public class SecretInbox {
 		System.out.println("SecretInbox Attivato");
 
 		/*
-		 * Dichiarazione e inizializzazione delle variabili di decifratura e connessione socket
+		 * Dichiarazione e inizializzazione della variabile di connessione socket
 		 */
-		Decifratore macchinaDecifratrice = new Decifratore();
-
 		InboxSocket s = new InboxSocket();
 
 		/*
@@ -41,17 +39,21 @@ public class SecretInbox {
 		//Si attende che arrivi un messaggio
 		for(;;){
 			s.riceviMessaggio();
-			/*
-			 * Messaggio arrivato
-			 * Parte il timer di 2 secondi, arriva il suono e compare la notifica che dice che è arrivato un messaggio
-			 */
-			NotificaMessaggio.clessidra(3).start();
-			NotificaMessaggio.suonoNotifica("src/secretInbox/Suoni/NotificationSoundEffect.wav");
-			JOptionPane.showMessageDialog(null, "È appena arrivato un messaggio", "Nuova notifica", JOptionPane.INFORMATION_MESSAGE, iconaAgenteSegreto);
+			if(InboxSocket.accettazione) {//La condizione è necessaria per capire se la socket è ancora aperta o meno
+				/*
+				 * Messaggio arrivato
+				 * Parte il timer di 3 secondi, arriva il suono e compare la notifica che dice che è arrivato un messaggio
+				 */
+				NotificaMessaggio.clessidra(3).start();
+				NotificaMessaggio.suonoNotifica("src/secretInbox/Suoni/NotificationSoundEffect.wav");
+				JOptionPane.showMessageDialog(null, "È appena arrivato un messaggio", "Nuova notifica", JOptionPane.INFORMATION_MESSAGE, iconaAgenteSegreto);
 
-			System.out.println("È appena arrivato un messaggio");
+				System.out.println("È appena arrivato un messaggio");
+				
+				obj.aggiungiMessaggioInLista(s.getMessaggioRicevuto());
+				
 
-
+			}//Chiusura dell'if necessario all'accertamento che la socket di ricezione sia attiva
 		}//Fine del ciclo infinito	
 	}
 }

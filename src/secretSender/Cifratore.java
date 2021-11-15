@@ -9,7 +9,7 @@ public class Cifratore {
 	 * Variabile Stringa che contiene il contenuto completo da cifrare
 	 * 		Esso contiene il codice dell'agente segreto e il messaggio da inviare
 	 */
-	private String messaggioDaCifrare;
+	private String messaggioDaCifrare = "";
 	/*
 	 * Varibaile lista che ha il contenuto equivalente del messaggio da cifrare
 	 * La funzione della lista è quella di poter lavorare facilmente con il
@@ -27,7 +27,7 @@ public class Cifratore {
 	 * variabile booleana che serve a salvare l'informazione in merito al fatto che la
 	 * lettera sia minuscola o maiuscola
 	 */
-	private Boolean upperCase;
+	private Boolean downerCase;
 	/*
 	 * Variabile di appoggio che salva in codice ASCII la chiave,
 	 * successivamente si va a sommare questo valore alla lettera della stringa,
@@ -76,9 +76,8 @@ public class Cifratore {
 		 * è stata già eseguita dalla classe "SenderWIndow", esso impone che il
 		 * numero debba essere strettamente maggiore di 1
 		 */
-		if(chiave > 26) {
-			chiave %= 26;
-			chiave++;
+		if(chiave > 255) {
+			chiave %= 255;
 		}
 
 		/*
@@ -99,35 +98,34 @@ public class Cifratore {
 			 * maiuscola o minuscola. All'inizio viene salvato tale dato
 			 * successivamente la lettera viene resa momentaneamente maiuscola
 			 */
-			upperCase = Character.isUpperCase(listaDaCifrare.get(i));
+			downerCase = Character.isLowerCase(listaDaCifrare.get(i));
 
 			listaDaCifrare.set(i, Character.toUpperCase(listaDaCifrare.get(i)));
-			
+
 			/*
 			 * Viene salvato il valore ASCII della lettera in cui la lettera deve essere trasformata
 			 */
 			numeroSommatoreAscii = (int) listaDaCifrare.get(i) + chiave;
-			
+
 			/*
 			 * Se il nuovo valore ASCII supera 90 (valore ASCII della "Z") significa che deve ripartire
 			 * dall'inizio dell'alfabeto, facendo quindi un "-26"
 			 */
 			if(numeroSommatoreAscii > 90)
 				numeroSommatoreAscii -= 26;
-			
+
 			/*
 			 * Conversione del valore ASCII in carattere
 			 */
 			listaDaCifrare.set(i,(char) numeroSommatoreAscii);
-			
+
 			/*
 			 * Se la lettera in origine era minuscola, la lettera convertita diventa minuscola
 			 */
-			if(upperCase) {
-				Character.toLowerCase(listaDaCifrare.get(i));
-			}
+			if(downerCase)
+				listaDaCifrare.set(i, Character.toLowerCase(listaDaCifrare.get(i)));
 		}
-		
+
 		/*
 		 * La lista di caratteri viene trasformata in una Stringa
 		 */
@@ -135,13 +133,13 @@ public class Cifratore {
 		for(int i = 0; i < listaDaCifrare.size(); i++) {
 			messaggioCifrato = messaggioCifrato + listaDaCifrare.get(i);
 		}
-		
+
 		/*
 		 * Vengono rimossi tutti gli elementi della lista perché se no alla successiva conversione
 		 * avrebbe lasciato gli elementi di tutte le conversioni precedenti
 		 */
 		listaDaCifrare.removeAll(listaDaCifrare);
-		
+
 		//Stampa del messaggio cifrato
 		System.out.println("Messaggio cifrato: " + messaggioCifrato);
 
@@ -165,7 +163,7 @@ public class Cifratore {
 		 * sia stato salvato nella maniera corretta
 		 */
 		System.out.println("Messaggio da cifrare: " + messaggioDaCifrare);
-		
+
 		/*
 		 * Inserimento del messaggio da cifrare, da una stringa ad una lista
 		 * ciò semplicifica le operazioni di cifratura 
@@ -173,7 +171,7 @@ public class Cifratore {
 		for(int i = 0; i < messaggioDaCifrare.length(); i++) {
 			listaDaCifrare.add(i, messaggioDaCifrare.charAt(i));
 		}
-		
+
 
 
 
