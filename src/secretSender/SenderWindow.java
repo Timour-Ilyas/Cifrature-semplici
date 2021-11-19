@@ -24,7 +24,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 
-
 public class SenderWindow extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1917L;
 
@@ -44,7 +43,6 @@ public class SenderWindow extends JFrame implements ActionListener {
 	private JComboBox<String> metodoDiCifratura;
 	private JButton pulsanteDiConnessione;
 	private JButton invioMessaggio;
-	private IpPortWindow piccolaFinestraDiInput;
 	private JLabel sfondo;
 	private JButton pulsanteArchivio;
 
@@ -54,6 +52,17 @@ public class SenderWindow extends JFrame implements ActionListener {
 	private Cifratore macchinaCifratrice  = new Cifratore();
 
 	private SenderSocket s;
+
+	/*
+	 * Variabile per non aprire molteplici volte la finestra di ip o di archivio
+	 */
+	public static boolean accertamentoSullaFinestra = true;
+
+	/*
+	 * Piccole finestre secondarie
+	 */
+	private IpPortWindow piccolaFinestraDiInput;
+	private ArchivioSender as = new ArchivioSender();
 
 	/*
 	 * Costruttore in cui 
@@ -135,8 +144,8 @@ public class SenderWindow extends JFrame implements ActionListener {
 		codiceNumericoCampo.setBounds(530, 370, 40, 30);
 		codiceNumericoCampo.setDocument(new JTextLimit(4));
 		getContentPane().add(chiaveCampo);
-		chiaveCampo.setBounds(470, 440, 160, 30);
-
+		chiaveCampo.setBounds(470, 440, 100, 30);
+		chiaveCampo.setDocument(new JTextLimit(5));
 
 		scrittaPerChiave.setFont(new java.awt.Font("Tahoma", 0, 17));
 		scrittaPerChiave.setText("Chiave:");
@@ -154,7 +163,6 @@ public class SenderWindow extends JFrame implements ActionListener {
 
 		titolo.setFont(new java.awt.Font("Tahoma", 1, 70));
 		titolo.setText("SecretSender");
-		titolo.setToolTipText("");
 		titolo.setPreferredSize(new java.awt.Dimension(80, 20));
 		getContentPane().add(titolo);
 		titolo.setBounds(270, 0, 480, 110);
@@ -208,34 +216,11 @@ public class SenderWindow extends JFrame implements ActionListener {
 		});
 		pulsanteDiConnessione.addActionListener(this);
 		invioMessaggio.addActionListener(this);
-	}
-
-	/*
-	 * Metodo utilizzato per il controllo del codice dell'agente per assicurarsi che contenga solo cifre
-	 */
-	private static boolean osservatoreSpeciale(String stringa) 
-	{ 
-		try 
-		{  
-			Double.parseDouble(stringa);  
-			return true;
-		} catch(NumberFormatException e)
-		{  
-			return false;  
-		}  
+		pulsanteArchivio.addActionListener(this);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent listener) {
-
-		/*
-		 * Pulsante necessario per impostare i dati in modo da inviare il messaggio al destinatario
-		 */
-		if(pulsanteDiConnessione == listener.getSource()) {
-			piccolaFinestraDiInput = new IpPortWindow();
-			piccolaFinestraDiInput.setVisible(true);
-		}
-
 		/*
 		 * Quando il pulsante d'invio viene cliccato ci sono prima delle condizioni necessarie per
 		 * inviare il messaggio al destinatario
@@ -308,6 +293,13 @@ public class SenderWindow extends JFrame implements ActionListener {
 												s.setRisposta("null");
 											}
 										}
+
+										/*
+										 * Dopo che è stato effettuata la cifrata e l'invio del messaggio
+										 * Qualunque sia l'esisto:
+										 * 		Viene salvato il messaggio nell'archivio
+										 */
+										as.aggiungiMessaggioArchivio(codiceNumericoCampo.getText() + ": " + testoDaCifraCampo.getText());
 									}else {
 										JOptionPane.showMessageDialog(null, "Inserisci una chiave maggiore di 0", "Errore", JOptionPane.ERROR_MESSAGE);
 									}
@@ -338,6 +330,10 @@ public class SenderWindow extends JFrame implements ActionListener {
 			invioMessaggio.setEnabled(true);
 		}//Chiusura ActionListener del tasto invio (metodo di Cesare)
 
+		/*
+		 * Metodo di cifratura vigenère
+		 * Le condizioni necessarie sono scritte nel commento precedente alla cifratura di Cesare
+		 */
 		if(invioMessaggio == listener.getSource() && metodoDiCifratura.getSelectedIndex() == 1) {
 			testoDaCifraCampo.setEditable(false);
 			codiceNumericoCampo.setEditable(false);
@@ -346,10 +342,134 @@ public class SenderWindow extends JFrame implements ActionListener {
 			pulsanteDiConnessione.setEnabled(false);
 			invioMessaggio.setEnabled(false);
 
+			if(!testoDaCifraCampo.getText().isEmpty()){//Se il testo non è vuoto
+				if(!codiceNumericoCampo.getText().isEmpty()){//Se il codice agente non è vuoto
+					if(osservatoreSpeciale(codiceNumericoCampo.getText())){//Se il codice agente contiene solo cifre
+						if(codiceNumericoCampo.getText().trim().length() == 4){//Se il codice agente è composta da 4 cifre
+							if(!chiaveCampo.getText().isEmpty()){//Se la chiave non è vuota
+								if(osservatoreMegaSpeciale(chiaveCampo.getText())){//Se la chiave contiene solo lettere
+									/*
+									 * Cifratura del messaggio
+									 */
+									s.setMsg(macchinaCifratrice.cifraturaDiVigenère(testoDaCifraCampo.getText(), codiceNumericoCampo.getText(), chiaveCampo.getText()));
 
+									try{
+										s.setIp(piccolaFinestraDiInput.restituisci(s.getIp()));
+										s.setPorta(piccolaFinestraDiInput.restituisci(s.getPorta()));
+									}catch(NullPointerException e) {
+										JOptionPane.showMessageDialog(null, "Devi inserire un indirizzo ip e una porta", "Errore", JOptionPane.ERROR_MESSAGE);	
+									}
 
-			System.out.println("Cifratura del messaggio completata, metodo di Vigenère");
+									if(s.getIp() != null || s.getPorta() != 0) {
+										/*
+										 * GOOD ENDING
+										 * Tutte le condizioni sono andate a buon fine, adesso si procede per l'invio
+										 * del messaggio
+										 */
+										s.invioMessaggio();
+										System.out.println("Invio del messaggio al destinatario specificato");
 
+										/*
+										 * Attesa di 2 secondi per osservare se il messaggio arriva al destinatario
+										 */
+										try {
+											TimeUnit.SECONDS.sleep(2);
+										} catch (InterruptedException e) {
+											e.printStackTrace();
+										}
+
+										if(s.getRisposta() == "null") {
+											JOptionPane.showMessageDialog(null, "L'utente non esiste o non è attualmente raggiungibile", "Problema di connessione", JOptionPane.WARNING_MESSAGE);
+											System.out.println("Non è possibile raggiungere il destinatario");
+											s.setRisposta("null");
+										}
+									}
+
+									/*
+									 * Dopo che è stato effettuata la cifrata e l'invio del messaggio
+									 * Qualunque sia l'esisto:
+									 * 		Viene salvato il messaggio nell'archivio
+									 */
+									as.aggiungiMessaggioArchivio(codiceNumericoCampo.getText() + ": " + testoDaCifraCampo.getText());
+								}else {
+									JOptionPane.showMessageDialog(null, "La chiave con il metodo di Vigenère deve contenere solo cifre", "Errore", JOptionPane.ERROR_MESSAGE);
+								}
+							}else {
+								JOptionPane.showMessageDialog(null, "Non inserito una chiave", "Errore", JOptionPane.ERROR_MESSAGE);
+							}
+						}else {
+							JOptionPane.showMessageDialog(null, "Il codice agente deve essere composto da 4 cifre", "Errore", JOptionPane.ERROR_MESSAGE);
+						}
+					}else {
+						JOptionPane.showMessageDialog(null, "Il codice agente deve contenere solo cifre", "Errore", JOptionPane.ERROR_MESSAGE);
+					}
+				}else {
+					JOptionPane.showMessageDialog(null, "Non hai inserito il tuo codice agente", "Errore", JOptionPane.ERROR_MESSAGE);
+				}
+			}else {
+				JOptionPane.showMessageDialog(null, "Non hai inserito alcun messaggio", "Errore", JOptionPane.ERROR_MESSAGE);
+			}
+
+			System.out.println("\nCifratura del messaggio completata, metodo di Vigenère");
+
+			testoDaCifraCampo.setEditable(true);
+			codiceNumericoCampo.setEditable(true);
+			chiaveCampo.setEditable(true);
+			metodoDiCifratura.setEnabled(true);
+			pulsanteDiConnessione.setEnabled(true);
+			invioMessaggio.setEnabled(true);
 		}//Chiusura ActionListener del tasto invio (metodo di Vigenère)
+
+		/*
+		 * Pulsante necessario per impostare i dati in modo da inviare il messaggio al destinatario
+		 */
+		if(pulsanteDiConnessione == listener.getSource()) {
+			piccolaFinestraDiInput = new IpPortWindow();
+			if(accertamentoSullaFinestra) {
+				piccolaFinestraDiInput.setVisible(true);
+				accertamentoSullaFinestra = false;
+			}
+		}
+
+		if(pulsanteArchivio == listener.getSource()) {	
+			/*
+			 * Se la finestra è stata già aperta non apre un'altra finestra ma mette il focus su quella già aperta
+			 */
+			if(accertamentoSullaFinestra) {
+				as.setVisible(true);
+				accertamentoSullaFinestra = false;
+			}
+		}
 	}//Chiusura metodo degli ActionListener
+
+	/*
+	 * Metodo utilizzato per il controllo del codice dell'agente per assicurarsi che contenga solo cifre
+	 */
+	private static boolean osservatoreSpeciale(String stringa) 
+	{ 
+		try 
+		{  
+			Double.parseDouble(stringa);  
+			return true;
+		} catch(NumberFormatException e)
+		{  
+			return false;  
+		}  
+	}
+
+	/*
+	 * Metodo utilizzato per il controllo della chiave nella cifratura di Vigenère
+	 * Per assicurarsi che contenga solo lettere
+	 */
+	private static boolean osservatoreMegaSpeciale(String stringa) {
+		for(int i = 0; i < stringa.length(); i++) {
+			for(int j = 0; j < 9; j++) {
+				if(stringa.charAt(i) == Integer.toString(j).charAt(0)) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
 }

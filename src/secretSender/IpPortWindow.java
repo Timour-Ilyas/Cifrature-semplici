@@ -10,6 +10,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import javax.swing.JButton;
@@ -38,7 +40,7 @@ public class IpPortWindow extends JFrame implements ActionListener{
 	private JButton pulsantePositivo;
 	private JButton pulsanteNegativo;
 
-	private int x = 300, y = 10, larghezza = 1000, lunghezza = 800;
+	private int x = 300, y = 50, larghezza = 1000, lunghezza = 800;
 
 	/*
 	 * Variabili provvisorie di scambio
@@ -49,8 +51,18 @@ public class IpPortWindow extends JFrame implements ActionListener{
 	public IpPortWindow() {
 		super("Dati del Quartier Generale");
 		initComponentsIpPorta();
-		setResizable(false);		
+		setResizable(false);
 		setAlwaysOnTop(true);
+
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		addWindowListener( new WindowAdapter()
+		{
+			public void windowClosing(WindowEvent e)
+			{
+				SenderWindow.accertamentoSullaFinestra = true;
+				dispose();
+			}
+		});
 	}
 
 	private void initComponentsIpPorta() {
@@ -73,7 +85,6 @@ public class IpPortWindow extends JFrame implements ActionListener{
 		x = 300; y = 10; larghezza = 450; lunghezza = 150;
 
 		setBounds(x, y, larghezza, lunghezza);
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
 		scrittaInformativa.setText("Inserisci l'IP e la Porta del Quartier Generale");
 		scrittaInformativa.setFont(new Font("Arial",17, 17));
@@ -156,19 +167,23 @@ public class IpPortWindow extends JFrame implements ActionListener{
 						JOptionPane.showMessageDialog(null, "Host non riconosciuto", "Errore", JOptionPane.ERROR_MESSAGE);
 						System.out.println("Errore: Host non riconosciuto");
 					};
-
-					if(Integer.parseInt(portaCampo.getText()) <= 65535){
-						porta = Integer.parseInt(portaCampo.getText());
-						/*
-						 * GOOD ENDING, i dati sono stati inseriti correttamente
-						 * La funzione di questa classe termina qui, la finestra si chiuse
-						 */
-						System.out.println("Ip: " + ip + "\nPorta: " + porta);
-						dispose();
-					}else {
-						porta = null;
-						JOptionPane.showMessageDialog(null, "La porta può essere al massimo 65535", "Errore", JOptionPane.ERROR_MESSAGE);
-						System.out.println("Errore: La porta può essere al massimo 65535");
+					try{
+						if(Integer.parseInt(portaCampo.getText()) <= 65535){
+							porta = Integer.parseInt(portaCampo.getText());
+							/*
+							 * GOOD ENDING, i dati sono stati inseriti correttamente
+							 * La funzione di questa classe termina qui, la finestra si chiuse
+							 */
+							System.out.println("Ip: " + ip + "\nPorta: " + porta);
+							dispose();
+						}else {
+							porta = null;
+							JOptionPane.showMessageDialog(null, "La porta può essere al massimo 65535", "Errore", JOptionPane.ERROR_MESSAGE);
+							System.out.println("Errore: La porta può essere al massimo 65535");
+						}
+					}catch(NumberFormatException evtExp) {
+						JOptionPane.showMessageDialog(null, "La porta deve essere un numero", "Errore", JOptionPane.ERROR_MESSAGE);
+						System.out.println("La porta deve essere un numero");
 					}
 				}else {
 					JOptionPane.showMessageDialog(null, "Inserisci una porta", "Errore", JOptionPane.ERROR_MESSAGE);
@@ -182,6 +197,7 @@ public class IpPortWindow extends JFrame implements ActionListener{
 		 * Il pulsante annulla esce dalla finestra di impostazione Ip e porta senza salvare nulla
 		 */
 		if(pulsanteNegativo == listener.getSource()) {
+			SenderWindow.accertamentoSullaFinestra = true;
 			ip = null;
 			porta = null;
 			dispose();

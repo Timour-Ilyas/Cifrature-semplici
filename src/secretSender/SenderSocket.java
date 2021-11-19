@@ -1,5 +1,4 @@
 /*
-
  * La classe gestisce la socket del SecretSender
  */
 package secretSender;

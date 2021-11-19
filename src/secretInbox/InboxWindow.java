@@ -64,7 +64,12 @@ public class InboxWindow extends JFrame implements ActionListener{
 	 * Lista che contiene tutti i messaggi inviati dall'utente
 	 */
 	private LinkedList<String> listaDeiMessaggi = new LinkedList<String>();
-
+	
+	/*
+	 * Variabile per non aprire molteplici volte la finestra di ip o di archivio
+	 */
+	public static boolean accertamentoSullaFinestra = true;
+	
 	/*
 	 * Costruttore in cui 
 	 * 		Si cambia il nome della finestra
