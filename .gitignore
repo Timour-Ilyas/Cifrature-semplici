@@ -2,3 +2,4 @@ bin/
 .metadata
 tmp/
 .settings/
+.DS_Store
