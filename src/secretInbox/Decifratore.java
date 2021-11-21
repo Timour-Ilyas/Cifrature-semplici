@@ -29,7 +29,7 @@ public class Decifratore {
 		 * Ciò serve anche per controllare che l'input inserito
 		 * sia stato salvato nella maniera corretta
 		 */
-		System.out.println("Messaggio da decifrare: " + testo);
+		//System.out.println("Messaggio da decifrare: " + testo);
 
 		/*
 		 * Preparazione del messaggio da decifrare
@@ -60,7 +60,7 @@ public class Decifratore {
 		messaggioDecifrato = new String(arrayDiByteDecifrato, 0, arrayDiByteDecifrato.length).trim();
 
 		//Stampa del messaggio cifrato
-		System.out.println("Messaggio decifrato: " + messaggioDecifrato);
+		//System.out.println("Messaggio decifrato: " + messaggioDecifrato);
 
 		return messaggioDecifrato;
 	}
@@ -75,7 +75,7 @@ public class Decifratore {
 		 * Ciò serve anche per controllare che l'input inserito
 		 * sia stato salvato nella maniera corretta
 		 */
-		System.out.println("Messaggio da decifrare: " + testo);
+		//System.out.println("Messaggio da decifrare: " + testo);
 
 		/*
 		 * Preparazione del messaggio da cifrare
@@ -111,8 +111,20 @@ public class Decifratore {
 
 		messaggioDecifrato = new String(arrayDiByteDecifrato, 0, arrayDiByteDecifrato.length).trim();
 
-		System.out.println("Messaggio decifrato: " + messaggioDecifrato);
+		//System.out.println("Messaggio decifrato: " + messaggioDecifrato);
 
 		return messaggioDecifrato;
+	}
+	
+	/*
+	 * Metodo di Vigenère con parametro chiave int
+	 */
+	public String decifraturaDiVigenère(String testo, int chiave) {
+		/*
+		 * Se come chiave viene passato un intero
+		 * Trasforma la chiave in una stringa e chiama il metodo principale che esegue il calcolo
+		 */
+		String chiaveInStringa = String.valueOf(chiave);
+		return decifraturaDiVigenère(testo, chiaveInStringa);
 	}
 }

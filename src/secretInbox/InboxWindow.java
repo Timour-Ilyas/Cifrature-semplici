@@ -61,15 +61,26 @@ public class InboxWindow extends JFrame implements ActionListener{
 	private Decifratore macchinaDecifratrice = new Decifratore();
 
 	/*
-	 * Lista che contiene tutti i messaggi inviati dall'utente
+	 * Lista che contiene tutti i messaggi parziali inviati dall'utente
 	 */
 	private LinkedList<String> listaDeiMessaggi = new LinkedList<String>();
-	
+
+	/*
+	 * Lista che contiene tutti i messaggi totali inviati dall'utente
+	 */
+	private LinkedList<String> listaDeiMessaggiTotali = new LinkedList<String>();
+
 	/*
 	 * Variabile per non aprire molteplici volte la finestra di ip o di archivio
 	 */
 	public static boolean accertamentoSullaFinestra = true;
-	
+
+	/*
+	 * Piccole finestre secondarie
+	 */
+	private ForzaBruta fb;
+	private ArchivioInbox ai = new ArchivioInbox();
+
 	/*
 	 * Costruttore in cui 
 	 * 		Si cambia il nome della finestra
@@ -154,7 +165,7 @@ public class InboxWindow extends JFrame implements ActionListener{
 		getContentPane().add(tastoConverti);
 		tastoConverti.setBounds(420, 650, 150, 30);
 
-		tastoForzaBrutale.setText("Forza Brutale");
+		tastoForzaBrutale.setText("Forza Bruta");
 
 		getContentPane().add(tastoForzaBrutale);
 		tastoForzaBrutale.setBounds(40, 680, 150, 30);
@@ -212,6 +223,7 @@ public class InboxWindow extends JFrame implements ActionListener{
 					areaOriginali.setText(listaDeiMessaggi.get(messaggioSelezionato));
 				}catch(IndexOutOfBoundsException ee) {}
 				areaConvertiti.setText("");
+				tastoForzaBrutale.setEnabled(true);
 			}
 		};
 		listaGraficaMessaggi.addMouseListener(mouseListener);
@@ -234,6 +246,7 @@ public class InboxWindow extends JFrame implements ActionListener{
 				messaggioSelezionato = listaGraficaMessaggi.getSelectedIndex();
 				areaOriginali.setText(listaDeiMessaggi.get(messaggioSelezionato));
 				areaConvertiti.setText("");
+				tastoForzaBrutale.setEnabled(true);
 			}
 		});
 
@@ -246,6 +259,7 @@ public class InboxWindow extends JFrame implements ActionListener{
 				messaggioSelezionato = listaGraficaMessaggi.getSelectedIndex();
 				areaOriginali.setText(listaDeiMessaggi.get(messaggioSelezionato));
 				areaConvertiti.setText("");
+				tastoForzaBrutale.setEnabled(true);
 			}
 		});
 
@@ -329,11 +343,21 @@ public class InboxWindow extends JFrame implements ActionListener{
 		}//Parentesi chiusa dell'evento pressione tasto
 
 		if(tastoArchivioDati == e.getSource()) {
-
+			/*
+			 * Se la finestra è stata già aperta non apre un'altra finestra ma mette il focus su quella già aperta
+			 */
+			if(accertamentoSullaFinestra) {
+				ai.setVisible(true);
+				accertamentoSullaFinestra = false;
+			}
 		}//Parentesi chiusa dell'evento pressione tasto
 
 		if(tastoForzaBrutale == e.getSource()) {
-
+			fb = new ForzaBruta(listaDeiMessaggiTotali.get(messaggioSelezionato));
+			if(accertamentoSullaFinestra) {
+				fb.setVisible(true);
+				accertamentoSullaFinestra = false;
+			}
 		}//Parentesi chiusa dell'evento pressione tasto
 	}//Chiusura ActionListener
 
@@ -342,14 +366,11 @@ public class InboxWindow extends JFrame implements ActionListener{
 		 * Estrazione del messaggio dal pacchetto inviato dall'utente
 		 */
 		String messaggio = "";
-		for(int i = 6; i < pacchetto.length(); i++) {
-			if(pacchetto.charAt(i) == '') {
-				messaggio += System.getProperty("line.separator");
-			}
-			else messaggio += pacchetto.charAt(i);
-		}
+		for(int i = 6; i < pacchetto.length(); i++)
+			messaggio += pacchetto.charAt(i);
 
-		listaDeiMessaggi.add(messaggio);//Aggiunta alla lista dei messaggi quello appena arrivato
+		listaDeiMessaggi.add(messaggio);//Aggiunta alla lista dei messaggi parziali quello appena calcolato
+		listaDeiMessaggiTotali.add(pacchetto);//Aggiunta alla lista dei messaggi completi
 		String[] strings = new String[listaDeiMessaggi.size()];//Reset della stringa da inserire
 
 		/*
@@ -379,7 +400,6 @@ public class InboxWindow extends JFrame implements ActionListener{
 		});
 
 		listaGraficaMessaggi.setEnabled(true);
-		tastoForzaBrutale.setEnabled(true);
 		tastoConverti.setEnabled(true);
 		areaChiave.setEditable(true);
 		metodoDiCifratura.setEnabled(true);

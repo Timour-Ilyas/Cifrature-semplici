@@ -62,14 +62,13 @@ public class ArchivioInbox extends JFrame implements ActionListener {
 		setResizable(false);
 		setBounds(x, y, larghezza, lunghezza);
 
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-
 		try {
 			flW = new FileWriter(fl);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-
+		
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener( new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent e)
@@ -107,9 +106,7 @@ public class ArchivioInbox extends JFrame implements ActionListener {
 		annulla.setPreferredSize(new java.awt.Dimension(100, 30));
 
 		pannelloSuperiore.add(titolo);
-		pannelloInferiore.add(inserisci);
-		pannelloInferiore.add(annulla);
-
+		
 		presenzaFile = situazioneAttuale();
 
 		/*
@@ -125,7 +122,10 @@ public class ArchivioInbox extends JFrame implements ActionListener {
 		}else {
 
 		}
-
+		
+		pannelloInferiore.add(inserisci);
+		pannelloInferiore.add(annulla);
+		
 		getContentPane().add(pannelloSuperiore, BorderLayout.NORTH);
 		getContentPane().add(pannelloCentrale, BorderLayout.CENTER);
 		getContentPane().add(pannelloInferiore, BorderLayout.SOUTH);
