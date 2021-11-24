@@ -96,6 +96,9 @@ public class SenderWindow extends JFrame implements ActionListener {
 		});
 	}
 
+	/*
+	 * Metodo per inserire i componenti nella finestra
+	 */
 	private void initComponents() {
 		/*
 		 * Inizializzazione dei componenti
@@ -218,7 +221,10 @@ public class SenderWindow extends JFrame implements ActionListener {
 		invioMessaggio.addActionListener(this);
 		pulsanteArchivio.addActionListener(this);
 	}
-
+	
+	/*
+	 * Parte per far funzionare i pulsanti
+	 */
 	@Override
 	public void actionPerformed(ActionEvent listener) {
 		/*
@@ -242,7 +248,8 @@ public class SenderWindow extends JFrame implements ActionListener {
 		 * 	  		Verificare la correttezza dell'indirizzo IP
 		 * 			Verifica che la porta sia un valore compreso tra 1024 e 65535
 		 */
-		if(invioMessaggio == listener.getSource() && metodoDiCifratura.getSelectedIndex() == 0) {			
+		if(invioMessaggio == listener.getSource() && metodoDiCifratura.getSelectedIndex() == 0) {	
+			//Viene messo tutto a false per non generare errori
 			testoDaCifraCampo.setEditable(false);
 			codiceNumericoCampo.setEditable(false);
 			chiaveCampo.setEditable(false);
@@ -321,7 +328,8 @@ public class SenderWindow extends JFrame implements ActionListener {
 			}else {
 				JOptionPane.showMessageDialog(null, "Non hai inserito alcun messaggio", "Errore", JOptionPane.ERROR_MESSAGE);
 			}
-
+			
+			//I componenti si riattivano
 			testoDaCifraCampo.setEditable(true);
 			codiceNumericoCampo.setEditable(true);
 			chiaveCampo.setEditable(true);
@@ -409,8 +417,6 @@ public class SenderWindow extends JFrame implements ActionListener {
 			}else {
 				JOptionPane.showMessageDialog(null, "Non hai inserito alcun messaggio", "Errore", JOptionPane.ERROR_MESSAGE);
 			}
-
-			System.out.println("\nCifratura del messaggio completata, metodo di Vigenère");
 
 			testoDaCifraCampo.setEditable(true);
 			codiceNumericoCampo.setEditable(true);

@@ -45,8 +45,8 @@ public class IpPortWindow extends JFrame implements ActionListener{
 	/*
 	 * Variabili provvisorie di scambio
 	 */
-	private InetAddress ip;
-	private Integer porta;
+	private InetAddress ip = null;
+	private Integer porta = null;
 
 	public IpPortWindow() {
 		super("Dati del Quartier Generale");
@@ -175,6 +175,7 @@ public class IpPortWindow extends JFrame implements ActionListener{
 							 * La funzione di questa classe termina qui, la finestra si chiuse
 							 */
 							System.out.println("Ip: " + ip + "\nPorta: " + porta);
+							SenderWindow.accertamentoSullaFinestra = true;
 							dispose();
 						}else {
 							porta = null;
@@ -198,8 +199,6 @@ public class IpPortWindow extends JFrame implements ActionListener{
 		 */
 		if(pulsanteNegativo == listener.getSource()) {
 			SenderWindow.accertamentoSullaFinestra = true;
-			ip = null;
-			porta = null;
 			dispose();
 		}
 	}

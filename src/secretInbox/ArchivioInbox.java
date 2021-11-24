@@ -8,9 +8,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import javax.swing.AbstractAction;
@@ -18,7 +16,6 @@ import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -46,14 +43,10 @@ public class ArchivioInbox extends JFrame implements ActionListener {
 	 */
 	private File fl = new File("src/Archivio.txt");
 	private FileWriter flW;
-	private JFileChooser scegliFile;
-	private BufferedReader lettore;
-	private String riga;
 	private boolean presenzaFile;
 
 	private JScrollPane scrollino;
 	private JList<String> listaGraficaMessaggi = new JList<>();
-	private int messaggioSelezionato = -1;
 
 	public ArchivioInbox() {
 		super("Archivio");
@@ -67,7 +60,7 @@ public class ArchivioInbox extends JFrame implements ActionListener {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
+
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener( new WindowAdapter()
 		{
@@ -106,8 +99,6 @@ public class ArchivioInbox extends JFrame implements ActionListener {
 		annulla.setPreferredSize(new java.awt.Dimension(100, 30));
 
 		pannelloSuperiore.add(titolo);
-		
-		presenzaFile = situazioneAttuale();
 
 		/*
 		 * Se non c'è nessun messaggio salvato allora lo scrive sulla finestra
@@ -122,10 +113,10 @@ public class ArchivioInbox extends JFrame implements ActionListener {
 		}else {
 
 		}
-		
+
 		pannelloInferiore.add(inserisci);
 		pannelloInferiore.add(annulla);
-		
+
 		getContentPane().add(pannelloSuperiore, BorderLayout.NORTH);
 		getContentPane().add(pannelloCentrale, BorderLayout.CENTER);
 		getContentPane().add(pannelloInferiore, BorderLayout.SOUTH);
@@ -137,7 +128,6 @@ public class ArchivioInbox extends JFrame implements ActionListener {
 		 */
 		MouseListener mouseListener = new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
-				messaggioSelezionato = listaGraficaMessaggi.getSelectedIndex();
 			}
 		};
 		listaGraficaMessaggi.addMouseListener(mouseListener);
@@ -157,7 +147,6 @@ public class ArchivioInbox extends JFrame implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				listaGraficaMessaggi.setSelectedIndex(listaGraficaMessaggi.getSelectedIndex() - 1);
-				messaggioSelezionato = listaGraficaMessaggi.getSelectedIndex();
 			}
 		});
 
@@ -167,36 +156,15 @@ public class ArchivioInbox extends JFrame implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				listaGraficaMessaggi.setSelectedIndex(listaGraficaMessaggi.getSelectedIndex() + 1);
-				messaggioSelezionato = listaGraficaMessaggi.getSelectedIndex();
 			}
 		});
 		inserisci.addActionListener(this);
 		annulla.addActionListener(this);
 	}
 
-	private boolean situazioneAttuale() {
-		try {
-			/*
-			 * Lettura del file per osservare se ci sono messaggi salvati
-			 */
-			lettore = new BufferedReader(new FileReader(fl));
-
-			/*
-			 * Se c'è un messaggio salvato
-			 */
-			if((riga = lettore.readLine()) != null) {
-				return true;
-			}
-		} catch (IOException e) {
-			System.out.println("Non c'è nessun file nell'archivio");
-		}
-		return false;
-	}
-
 	public void aggiungiMessaggioArchivio(String messaggio) { 
 		//Viene aggiunto il messaggio al file
 		try {
-			lettore = new BufferedReader(new FileReader(fl));
 			flW.append(messaggio);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -204,14 +172,6 @@ public class ArchivioInbox extends JFrame implements ActionListener {
 
 		//Viene contato il numero di righe che ha il file
 		int contatoreRighe = 0;
-		try {
-			while((riga = lettore.readLine()) != null) {
-				lettore.skip(1);
-				contatoreRighe++;
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
 		String[] strings = new String[contatoreRighe];//Reset della stringa da inserire
 
@@ -242,7 +202,6 @@ public class ArchivioInbox extends JFrame implements ActionListener {
 		});
 
 		scrollino.setViewportView(listaGraficaMessaggi);
-		situazioneAttuale();
 	}
 
 	@Override

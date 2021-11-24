@@ -197,7 +197,7 @@ public class ArchivioSender extends JFrame implements ActionListener {
 		//Viene aggiunto il messaggio al file
 		try {
 			lettore = new BufferedReader(new FileReader(fl));
-			flW.append(messaggio);
+			flW.append(messaggio);//Append lascia il file testo intatto e aggiunge il nuovo messaggio
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

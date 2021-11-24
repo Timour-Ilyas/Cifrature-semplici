@@ -75,7 +75,7 @@ public class SenderSocket extends Thread{
 	 * Metodo che invia il messaggio al destinatario specificato dai dati inseriti
 	 * Se non sono stati impostati i dati, non viene utilizzato il metodo
 	 */
-	public void invioMessaggio() {
+	public void invioMessaggio() {//INVIO
 		try {
 			dp = new DatagramPacket(msg.getBytes(),msg.getBytes().length,ip,porta);
 			socket.send(dp);
@@ -88,7 +88,7 @@ public class SenderSocket extends Thread{
 	 * Viene avviato un thread che rimane sempre attivo in ascolto ad attendere l'arrivo di un messaggio
 	 * La socket attiva che ascolta viene chiusua dall'interno in modo che alla chiusura del programma la socket non si ancora aperta
 	 */
-	public void run() {
+	public void run() {//ASCOLTO
 		while(ripetizione) {
 			try {
 				for(int k = 0; k < buf.length; k++) buf[k] = 0;

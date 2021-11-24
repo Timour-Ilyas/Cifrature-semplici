@@ -37,7 +37,7 @@ public class SecretInbox {
 		ImageIcon iconaAgenteSegreto = new ImageIcon("src/secretInbox/Immagini/SmallSecretAgentIcon.png");
 
 		//Si attende che arrivi un messaggio
-		for(;;){
+		for(;;){//Ciclo for infinito finché non viene chiuso il programma
 			s.riceviMessaggio();
 			if(InboxSocket.accettazione) {//La condizione è necessaria per capire se la socket è ancora aperta o meno
 				/*

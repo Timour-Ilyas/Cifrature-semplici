@@ -223,7 +223,8 @@ public class InboxWindow extends JFrame implements ActionListener{
 					areaOriginali.setText(listaDeiMessaggi.get(messaggioSelezionato));
 				}catch(IndexOutOfBoundsException ee) {}
 				areaConvertiti.setText("");
-				tastoForzaBrutale.setEnabled(true);
+				if(messaggioSelezionato != -1)//Se non è ancora arrivato nessun messaggio, non attiva il pulsante
+					tastoForzaBrutale.setEnabled(true);
 			}
 		};
 		listaGraficaMessaggi.addMouseListener(mouseListener);
@@ -272,7 +273,7 @@ public class InboxWindow extends JFrame implements ActionListener{
 	 * Metodo utilizzato per il controllo della chiave nella cifratura di cesare
 	 * Per assicurarsi che contenga solo cifre
 	 */
-	private static boolean osservatoreSpeciale(String stringa) 
+	private static boolean osservatoreSpeciale(String stringa) //Per i numeri (solo)
 	{ 
 		try 
 		{
@@ -288,7 +289,7 @@ public class InboxWindow extends JFrame implements ActionListener{
 	 * Metodo utilizzato per il controllo della chiave nella cifratura di Vigenère
 	 * Per assicurarsi che contenga solo lettere
 	 */
-	private static boolean osservatoreMegaSpeciale(String stringa) {
+	private static boolean osservatoreMegaSpeciale(String stringa) { //Per le cifre (solo)
 		for(int i = 0; i < stringa.length(); i++) {
 			for(int j = 0; j < 9; j++) {
 				if(stringa.charAt(i) == Integer.toString(j).charAt(0)) {
@@ -384,7 +385,7 @@ public class InboxWindow extends JFrame implements ActionListener{
 		 * Il vettore di stringhe contiene il numero di messaggi che sono arrivati
 		 * in modo da stamparne il numero sulla JList
 		 */
-		for(int i = 0; i < listaDeiMessaggi.size();i++) {
+		for(int i = 0; i < listaDeiMessaggi.size(); i++) {
 			int j = i+1;
 			strings[i] = ("Messaggio " + j);
 		}

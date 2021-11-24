@@ -50,7 +50,9 @@ public class Decifratore {
 		 */
 		int momentum;
 		for (int i = 0; i < arrayDiByteDaDecifrare.length; i++) {
-			momentum = (int) arrayDiByteDaDecifrare[i] - chiave;
+			momentum = (int) arrayDiByteDaDecifrare[i] - chiave + 256;
+			momentum %= 256;
+
 			if(arrayDiByteDaDecifrare[i] == '!')
 				arrayDiByteDecifrato[i] = (byte) 32;
 			else
@@ -83,6 +85,8 @@ public class Decifratore {
 		 * classe "InboxWindow"
 		 */
 		char[] arrayDiCharDaDecifrare = testo.toCharArray();
+		if(chiave.length() > 2)
+			chiave = chiave.substring(0, 2);
 		byte[] arrayDiByteDaDecifrare = new byte[arrayDiCharDaDecifrare.length];
 
 		for(int i = 0; i < arrayDiCharDaDecifrare.length;i++) 
