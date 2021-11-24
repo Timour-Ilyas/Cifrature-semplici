@@ -33,7 +33,7 @@ public class SenderSocket extends Thread{
 	/*
 	 * Variabili utilizzate per ricevere il messaggio di risposta dal destinatario
 	 */
-	private byte buf[] = new byte[64];
+	private byte buf[] = new byte[512];
 	private DatagramPacket pacchettoDaRicezione;
 	private String risposta = "null";
 

@@ -94,7 +94,8 @@ public class InboxWindow extends JFrame implements ActionListener{
 		 * Fare in modo che quando il programma termina viene chiusa la socket
 		 */
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-
+		setResizable(false);
+		
 		addWindowListener( new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent e)

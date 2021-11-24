@@ -212,7 +212,6 @@ public class ArchivioSender extends JFrame implements ActionListener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 		String[] strings = new String[contatoreRighe];//Reset della stringa da inserire
 
 		/*

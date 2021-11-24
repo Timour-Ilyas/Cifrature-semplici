@@ -31,7 +31,7 @@ public class InboxSocket {
 	/*
 	 * Variabili utilizzate per ricevere il messaggio di risposta dal destinatario
 	 */
-	private byte buf[] = new byte[64];
+	private byte buf[] = new byte[512];
 	private DatagramPacket pacchettoDaRicezione = new DatagramPacket(buf,buf.length);
 	private String messaggioRicevuto;
 	
