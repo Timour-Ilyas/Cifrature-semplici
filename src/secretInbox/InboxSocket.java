@@ -80,7 +80,7 @@ public class InboxSocket {
 			pacchettoDaRicezione  = new DatagramPacket(buf,buf.length);
 			socket.receive(pacchettoDaRicezione);
 
-			messaggioRicevuto = new String(pacchettoDaRicezione.getData(), 0, pacchettoDaRicezione.getData().length);
+			messaggioRicevuto = new String(pacchettoDaRicezione.getData(), 0, pacchettoDaRicezione.getData().length).trim();
 
 			setIp(pacchettoDaRicezione.getAddress());
 			setPorta(pacchettoDaRicezione.getPort());

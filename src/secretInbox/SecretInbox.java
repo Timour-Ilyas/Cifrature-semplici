@@ -11,7 +11,7 @@
 
  ** in output: Messaggio decifrato
 
- ** Osservazioni: Il programma contiene 6 classi
+ ** Osservazioni: Il programma contiene 7 classi
 				  Dato che il programma riceve il messaggio utilizzando socket UDP,
 				  dopo aver ricevuto il messaggio, invia un accertamento
  */
@@ -52,7 +52,6 @@ public class SecretInbox {
 				
 				obj.aggiungiMessaggioInLista(s.getMessaggioRicevuto());
 				
-
 			}//Chiusura dell'if necessario all'accertamento che la socket di ricezione sia attiva
 		}//Fine del ciclo infinito	
 	}
