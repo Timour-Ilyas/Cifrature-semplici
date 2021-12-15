@@ -316,8 +316,13 @@ public class InboxWindow extends JFrame implements ActionListener{
 							 * Se è stato scelto un messaggio e se è stata inserita una corretta chiave per decifrare
 							 * avviene il GOOD ENDING
 							 */
-							String msgConvertito = macchinaDecifratrice.decifraturaDiCesare(listaDeiMessaggi.get(messaggioSelezionato).trim(), Integer.parseInt(areaChiave.getText()));
+							String msgConvertito = "";
+							if(Integer.parseInt(areaChiave.getText())>15)
+								msgConvertito = macchinaDecifratrice.decifraturaDiCesare(listaDeiMessaggi.get(messaggioSelezionato).trim(), Integer.parseInt(areaChiave.getText())%15);
+							else
+								msgConvertito = macchinaDecifratrice.decifraturaDiCesare(listaDeiMessaggi.get(messaggioSelezionato).trim(), Integer.parseInt(areaChiave.getText()));
 							areaConvertiti.setText(msgConvertito);
+							
 						}else {
 							JOptionPane.showMessageDialog(null, "Con il metodo scelto devi inserire un numero", "Errore", JOptionPane.ERROR_MESSAGE);	
 						}

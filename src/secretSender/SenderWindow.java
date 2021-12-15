@@ -268,8 +268,10 @@ public class SenderWindow extends JFrame implements ActionListener {
 										/*
 										 * Cifratura del messaggio
 										 */
-										s.setMsg(macchinaCifratrice.cifraturaDiCesare(testoDaCifraCampo.getText(), codiceNumericoCampo.getText(), Integer.parseInt(chiaveCampo.getText())));
-
+										if(Integer.parseInt(chiaveCampo.getText())>15)
+											s.setMsg(macchinaCifratrice.cifraturaDiCesare(testoDaCifraCampo.getText(), codiceNumericoCampo.getText(), Integer.parseInt(chiaveCampo.getText())%15));
+										else
+											s.setMsg(macchinaCifratrice.cifraturaDiCesare(testoDaCifraCampo.getText(), codiceNumericoCampo.getText(), Integer.parseInt(chiaveCampo.getText())));
 										try{
 											s.setIp(piccolaFinestraDiInput.restituisci(s.getIp()));
 											s.setPorta(piccolaFinestraDiInput.restituisci(s.getPorta()));
